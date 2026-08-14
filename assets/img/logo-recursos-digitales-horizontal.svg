@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 72" width="340" height="72">
+  <defs>
+    <linearGradient id="lg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="55%" stop-color="#C026D3"/>
+      <stop offset="100%" stop-color="#FF6A3D"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(0,4)">
+    <rect x="1" y="1" width="62" height="62" rx="16" fill="url(#lg3)"/>
+    <text x="32" y="41" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="21" fill="#ffffff" text-anchor="middle" letter-spacing="-0.5">844</text>
+  </g>
+  <text x="78" y="36" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="19" fill="#F5F3FA" letter-spacing="0.3">844 RECURSOS</text>
+  <text x="78" y="56" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="19" fill="url(#lg3)" letter-spacing="0.3">DIGITALES</text>
+</svg>

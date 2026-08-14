@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ---------- Pricing toggle (contado / 3 pagos) ---------- */
   const toggleBtns = document.querySelectorAll(".pricing-toggle button");
   const priceEls = document.querySelectorAll("[data-price-onetime]");
+  const planWaBtns = document.querySelectorAll(".plan-wa-btn");
   toggleBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       toggleBtns.forEach((b) => b.classList.remove("is-active"));
@@ -100,6 +101,12 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           el.innerHTML = `$${parseInt(el.dataset.priceOnetime, 10).toLocaleString("es-MX")} <span>MXN pago único</span>`;
         }
+      });
+      planWaBtns.forEach((btn2) => {
+        const plan = btn2.dataset.plan;
+        const modeText = mode === "installments" ? " a 3 pagos" : " de contado";
+        const message = `Hola, me interesa el plan ${plan}${modeText}`;
+        btn2.href = `https://wa.me/528443509284?text=${encodeURIComponent(message)}`;
       });
     });
   });
@@ -161,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const addonText = selectedAddons.size ? [...selectedAddons].map((a) => ADDON_LABELS[a]).join(", ") : "sin funciones adicionales";
       const message = `Hola 844 Digital, quiero cotizar un sitio para: ${BUSINESS_LABELS[selectedBusiness]}. Funciones: ${addonText}. Rango estimado en el sitio: $${low.toLocaleString("es-MX")} - $${high.toLocaleString("es-MX")} MXN.`;
-      if (waBtn) waBtn.href = `https://wa.me/528440000000?text=${encodeURIComponent(message)}`;
+      if (waBtn) waBtn.href = `https://wa.me/528443509284?text=${encodeURIComponent(message)}`;
     }
 
     businessInputs.forEach((input) => {
