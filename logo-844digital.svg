@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 72" width="300" height="72">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="55%" stop-color="#C026D3"/>
+      <stop offset="100%" stop-color="#FF6A3D"/>
+    </linearGradient>
+  </defs>
+  <!-- icon -->
+  <g transform="translate(0,4)">
+    <rect x="1" y="1" width="62" height="62" rx="16" fill="url(#logoGrad)"/>
+    <rect x="1" y="1" width="62" height="62" rx="16" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+    <rect x="16" y="36" width="7" height="14" rx="2.5" fill="#ffffff"/>
+    <rect x="28.5" y="28" width="7" height="22" rx="2.5" fill="#ffffff"/>
+    <rect x="41" y="18" width="7" height="32" rx="2.5" fill="#ffffff" fill-opacity="0.95"/>
+    <circle cx="44.5" cy="14" r="4.5" fill="#00E6B8"/>
+  </g>
+  <!-- wordmark -->
+  <text x="78" y="42" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="30" fill="url(#logoGrad)" letter-spacing="0.5">844</text>
+  <text x="78" y="60" font-family="Arial, Helvetica, sans-serif" font-weight="600" font-size="14" fill="#F5F3FA" letter-spacing="4">DIGITAL</text>
+</svg>
