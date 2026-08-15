@@ -191,6 +191,22 @@ document.addEventListener("DOMContentLoaded", () => {
     recalc();
   }
 
+  /* ---------- Auditoría gratis ---------- */
+  const auditInput = document.getElementById("audit-url");
+  const auditBtn = document.querySelector(".audit-wa-btn");
+  function updateAuditLink() {
+    if (!auditBtn) return;
+    const url = (auditInput && auditInput.value.trim()) || "";
+    const message = url
+      ? `Hola 844 Digital, quiero mi auditoría gratis. El link de mi sitio actual es: ${url}`
+      : `Hola 844 Digital, quiero mi auditoría gratis. El link de mi sitio actual es:`;
+    auditBtn.href = `https://wa.me/528443509284?text=${encodeURIComponent(message)}`;
+  }
+  if (auditInput) {
+    auditInput.addEventListener("input", updateAuditLink);
+    updateAuditLink();
+  }
+
   /* ---------- Year in footer ---------- */
   const yearEl = document.querySelector("[data-year]");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
