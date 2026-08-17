@@ -539,6 +539,15 @@ button { font-family: inherit; cursor: pointer; }
 .case-hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
 .case-hero-mock { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--surface-border); box-shadow: var(--shadow-soft); }
 .case-hero-mock .portfolio-browser { aspect-ratio: 4/3; }
+.portfolio-browser-shot { flex: 1; overflow: hidden; background: #0B0B14; }
+.portfolio-browser-shot img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+
+/* ---------- Estimado de precio (páginas de caso) ---------- */
+.case-price-grid { display: grid; grid-template-columns: 1fr 0.85fr; gap: 50px; position: relative; z-index: 1; }
+.case-price-grid > * { min-width: 0; }
+.case-price-list { display: flex; flex-direction: column; gap: 14px; margin: 22px 0 24px; }
+.case-price-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14.5px; color: var(--text-dim); }
+.case-price-list svg { width: 18px; height: 18px; flex-shrink: 0; stroke: var(--teal); margin-top: 1px; }
 .case-facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px; }
 .case-fact { border-radius: var(--radius-sm); border: 1px solid var(--surface-border); background: var(--surface); padding: 18px 20px; }
 .case-fact span { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
@@ -562,7 +571,7 @@ button { font-family: inherit; cursor: pointer; }
 .section--dark .check-item, .section--alt .check-item { color: var(--text-dim); }
 
 /* ---------- Cotizador interactivo ---------- */
-.quoter {
+.quoter, .case-quoter {
   border-radius: 32px;
   background: linear-gradient(155deg, #1B1330 0%, #241536 55%, #2E1730 100%);
   border: 1px solid var(--surface-border);
@@ -570,7 +579,7 @@ button { font-family: inherit; cursor: pointer; }
   position: relative;
   overflow: hidden;
 }
-.quoter::before {
+.quoter::before, .case-quoter::before {
   content: "";
   position: absolute; width: 380px; height: 380px; border-radius: 50%;
   background: var(--grad-teal); opacity: 0.18; filter: blur(80px);
@@ -600,7 +609,7 @@ button { font-family: inherit; cursor: pointer; }
   color: #fff;
   border-color: transparent;
 }
-.quoter-result {
+.quoter-result, .case-quoter-result {
   background: rgba(255,255,255,0.06);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
@@ -610,13 +619,13 @@ button { font-family: inherit; cursor: pointer; }
   flex-direction: column;
   justify-content: space-between;
 }
-.quoter-result-label { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; }
-.quoter-price {
+.quoter-result-label, .case-quoter-result-label { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; }
+.quoter-price, .case-quoter-price {
   font-size: clamp(34px, 4vw, 46px);
   font-weight: 800;
   margin: 14px 0 6px;
 }
-.quoter-note { font-size: 13.5px; color: var(--text-dim); margin-bottom: 26px; }
+.quoter-note, .case-quoter-note { font-size: 13.5px; color: var(--text-dim); margin-bottom: 26px; }
 
 .quoter-transparency {
   position: relative;
@@ -929,6 +938,7 @@ button { font-family: inherit; cursor: pointer; }
   .case-hero-grid { grid-template-columns: 1fr; gap: 36px; }
   .case-facts { grid-template-columns: repeat(2, 1fr); }
   .check-grid { grid-template-columns: 1fr; }
+  .case-price-grid { grid-template-columns: 1fr; gap: 30px; }
 }
 
 @media (max-width: 720px) {
