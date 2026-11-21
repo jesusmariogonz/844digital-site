@@ -20,7 +20,7 @@ export default function Integraciones() {
       <PageHead title="Integraciones y arquitectura" sub="Qué es real en el prototipo y qué se conecta en la versión productiva. Ninguna integración externa está activa." />
       <div className="grid md:grid-cols-2 gap-4">
         {INTEGRATIONS.map(([t, d, f, now]) => (
-          <div key={t} className="card p-5"><div className="flex justify-between items-start gap-2"><h3 className="font-display text-2xl font-extrabold uppercase leading-none">{t}</h3><FlagBadge flag={f} /></div><p className="text-sm text-slate-600 mt-2">{d}</p><p className="text-xs font-bold text-brand mt-2">{now}</p></div>
+          <div key={t} className="card p-5"><div className="flex justify-between items-start gap-2"><h3 className="font-display text-2xl font-extrabold uppercase leading-none">{t}</h3><FlagBadge flag={f} always /></div><p className="text-sm text-slate-600 mt-2">{d}</p><p className="text-xs font-bold text-brand mt-2">{now}</p></div>
         ))}
       </div>
       <section className="card-dark p-6 mt-6">

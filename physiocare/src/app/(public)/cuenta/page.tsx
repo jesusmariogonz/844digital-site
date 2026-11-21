@@ -7,6 +7,7 @@ import { Empty, FlagBadge, Modal, PayChip, StatusChip } from "@/components/ui";
 import { SlotPicker } from "@/components/SlotPicker";
 import { recordFor, EXERCISES, PLAN_SESSIONS } from "@/lib/seed";
 import { Evolution } from "@/components/Evolution";
+import { DemoOnly } from "@/components/DemoUI";
 import { BeforeVisit } from "@/components/BeforeVisit";
 import { fmtTime, longDate, money, shortDate, todayStr } from "@/lib/dates";
 
@@ -95,7 +96,7 @@ export default function Cuenta() {
                 <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Tu progreso</div>
                 <div className="font-display text-6xl font-extrabold leading-none mt-2">{progress}%</div>
                 <div className="h-3 rounded-full bg-mist mt-3 overflow-hidden"><div className="h-full rounded-full bg-brand transition-all duration-1000" style={{ width: `${progress}%` }} /></div>
-                <p className="text-sm text-slate-500 mt-2">{doneSessions} de {PLAN_SESSIONS} sesiones del plan (ejemplo)</p>
+                <p className="text-sm text-slate-500 mt-2">{doneSessions} de {PLAN_SESSIONS} sesiones del plan</p>
               </section>
             </div>
 
@@ -109,7 +110,7 @@ export default function Cuenta() {
                       <span className="flex-1"><b className={on ? "line-through text-slate-400" : ""}>{e.name}</b><span className="block text-sm text-slate-500">{e.detail}</span></span>
                     </button></li>); })}
                 </ul>
-                <p className="text-xs text-slate-500 mt-2">Plan de ejemplo con datos ficticios.</p>
+                <DemoOnly><p className="text-xs text-slate-500 mt-2">Plan de ejemplo con datos ficticios.</p></DemoOnly>
               </section>
               <div className="grid gap-4 content-start">
                 <button onClick={() => setTab("Pagos")} className="card p-5 text-left hover-lift"><div className="text-xs font-bold uppercase text-slate-500">Pagos</div><div className="font-display text-4xl font-extrabold mt-1">{money(paid)}</div><div className="text-sm text-slate-500">pagado en total</div></button>
@@ -118,7 +119,7 @@ export default function Cuenta() {
             </div>
 
             <section className="card p-6">
-              <div className="flex items-center gap-2 flex-wrap"><h2 className="font-display text-3xl font-extrabold uppercase">Tu evolución</h2><span className="chip bg-slate-100 text-slate-600">Datos ficticios</span></div>
+              <div className="flex items-center gap-2 flex-wrap"><h2 className="font-display text-3xl font-extrabold uppercase">Tu evolución</h2><DemoOnly><span className="chip bg-slate-100 text-slate-600">Datos ficticios</span></DemoOnly></div>
               <div className="mt-4 max-w-2xl"><Evolution sesiones={rec.sesiones} /></div>
             </section>
 
@@ -138,7 +139,7 @@ export default function Cuenta() {
         )}
         {tab === "Mensajes" && (
           <>
-            <div className="flex items-center gap-2 flex-wrap"><h2 className="font-display text-3xl font-extrabold uppercase">Mensajes</h2><span className="chip bg-slate-100 text-slate-600">Simulados en la demo</span></div>
+            <div className="flex items-center gap-2 flex-wrap"><h2 className="font-display text-3xl font-extrabold uppercase">Mensajes</h2><DemoOnly><span className="chip bg-slate-100 text-slate-600">Simulados en la demo</span></DemoOnly></div>
             <p className="text-sm text-slate-600">Así te llegarían los avisos de tus citas por correo y WhatsApp.</p>
             {msgs.length ? msgs.slice(0, 30).map((n) => (
               <article key={n.id} className="card p-4">

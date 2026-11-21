@@ -6,6 +6,7 @@ import { BackLink, FlagBadge, PageHead, PayChip, StatusChip, Empty } from "@/com
 import { recordFor } from "@/lib/seed";
 import { fmtTime, shortDate, todayStr } from "@/lib/dates";
 import { Evolution } from "@/components/Evolution";
+import { DemoOnly } from "@/components/DemoUI";
 
 const ROLES: [string, string, string, string][] = [
   ["Fisioterapeuta (Erik)", "Ver y editar", "Ver y editar", "Ver y editar"],
@@ -73,7 +74,7 @@ export default function PacienteDetalle() {
             </div>
           </section>
           <section className="card p-6">
-            <div className="flex items-center gap-2 flex-wrap mb-4"><h3 className="font-display text-3xl font-extrabold uppercase">Evolución</h3><span className="chip bg-slate-100 text-slate-600">Datos ficticios</span></div>
+            <div className="flex items-center gap-2 flex-wrap mb-4"><h3 className="font-display text-3xl font-extrabold uppercase">Evolución</h3><DemoOnly><span className="chip bg-slate-100 text-slate-600">Datos ficticios</span></DemoOnly></div>
             <div className="max-w-3xl"><Evolution sesiones={rec.sesiones} /></div>
           </section>
           <div className="grid lg:grid-cols-2 gap-5">

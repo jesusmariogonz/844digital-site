@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
+import { DemoUIProvider } from "@/components/DemoUI";
 
 export const metadata: Metadata = {
   title: { default: "Erik Fitness and Rehab — Consultorio digital de fisioterapia", template: "%s · Erik Fitness and Rehab" },
-  description: "Prototipo de demostración de un consultorio digital de fisioterapia en Saltillo: agenda, portal del paciente, expediente digital y pagos. Desarrollado por 844 Digital.",
+  description: "Consultorio digital de fisioterapia en Saltillo: agenda en línea, portal del paciente, contenido educativo y preguntas al fisioterapeuta. Plataforma PhysioCare por 844 Digital.",
   robots: { index: false, follow: false },
 };
 export const viewport: Viewport = { themeColor: "#0b1b33", width: "device-width", initialScale: 1 };
@@ -18,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body>
-        <StoreProvider>{children}</StoreProvider>
+        <DemoUIProvider><StoreProvider>{children}</StoreProvider></DemoUIProvider>
       </body>
     </html>
   );

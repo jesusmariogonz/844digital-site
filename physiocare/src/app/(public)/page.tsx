@@ -4,7 +4,8 @@ import { useStore } from "@/lib/store";
 import { IMG } from "@/lib/images";
 import { Img } from "@/components/ui";
 import { ServiceCard, SectionHead } from "@/components/cards";
-import { PROFILE, BRAND } from "@/lib/seed";
+import { PROFILE, BRAND } from "@/lib/brand";
+import { DemoOnly } from "@/components/DemoUI";
 
 export default function Home() {
   const { db } = useStore();
@@ -135,7 +136,7 @@ export default function Home() {
               {PROFILE.reviewsRating && (
                 <div className="flex items-center gap-2"><span className="font-display text-5xl font-extrabold leading-none">{PROFILE.reviewsRating}</span><span><span className="text-amber text-xl block leading-none" aria-hidden="true">★★★★★</span><span className="text-sm text-slate-500">de 5 en reseñas</span></span></div>
               )}
-              {PROFILE.reviewsAreDemo && <span className="chip bg-slate-100 text-slate-600">Reseñas de ejemplo (demo)</span>}
+              {PROFILE.reviewsAreDemo && <DemoOnly><span className="chip bg-slate-100 text-slate-600">Reseñas de ejemplo (demo)</span></DemoOnly>}
             </div>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
@@ -147,7 +148,7 @@ export default function Home() {
               </figure>
             ))}
           </div>
-          {PROFILE.reviewsAreDemo && <p className="mt-4 text-xs text-slate-500">Reseñas ficticias de demostración. Se sustituyen por reseñas reales de pacientes, con su autorización.</p>}
+          {PROFILE.reviewsAreDemo && <DemoOnly><p className="mt-4 text-xs text-slate-500">Reseñas ficticias de demostración. Se sustituyen por reseñas reales de pacientes, con su autorización.</p></DemoOnly>}
         </section>
       )}
 

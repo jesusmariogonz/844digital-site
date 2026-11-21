@@ -18,6 +18,21 @@ npm run build    # compilación de producción
 npm run lint     # comprobación de tipos (tsc --noEmit)
 ```
 
+## Modo demostración (avisos)
+
+El sitio se ve **limpio** por defecto, como el producto terminado del cliente. Los avisos de prototipo (barra amarilla, etiquetas «Disponible en la demo» / «Integración pendiente», notas de datos ficticios) solo aparecen si se encienden:
+
+- Desde `/demo` con el interruptor «Avisos de demostración en el sitio», o
+- con `?demo=1` en cualquier URL (y `?demo=0` para apagarlos). Se guarda en el navegador.
+
+Aunque estén apagados, **siguen visibles los avisos que evitan malentendidos reales**: pagos y mensajes simulados, expediente ficticio y «usa solo datos ficticios».
+
+`/demo` es el «backstage» para presentar: guion, flujo completo del producto, estado de cada módulo y reinicio de datos. No está enlazado desde la navegación pública.
+
+## Reutilizar la plataforma para otro negocio
+
+Marca del producto y del cliente en `src/lib/brand.ts` (`PRODUCT`, `BRAND`, `PROFILE`). Colores en `src/app/globals.css` (`@theme`). Servicios, contenido y datos de ejemplo en `src/lib/seed.ts`. Con eso se adapta de PhysioCare a otro giro (DentalCare, VetCare…) sin reconstruir el producto.
+
 ## Rutas
 
 | Ruta | Descripción |
@@ -28,7 +43,7 @@ npm run lint     # comprobación de tipos (tsc --noEmit)
 | `/contacto` | Horarios, mapa, WhatsApp, Instagram, formulario |
 | `/agendar` | Reservación en 6 pasos (servicio → fecha/hora → cuenta → datos → pago simulado → confirmación) |
 | `/ingresar` · `/cuenta` | Acceso (demo / crear cuenta / recuperar) y portal del paciente |
-| `/demo` | Guía de presentación con las dos experiencias y el estado de cada módulo |
+| `/demo` | Backstage: guion, flujo del producto, estado de cada módulo e interruptor de avisos de demo |
 | `/admin` | Panel de Erik: resumen, agenda, pacientes (+ expediente), servicios, consola de contenido, preguntas, pagos, notificaciones, integraciones |
 
 ## Accesos de demostración

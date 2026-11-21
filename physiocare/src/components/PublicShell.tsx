@@ -3,7 +3,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Logo } from "./Logo";
-import { BRAND } from "@/lib/seed";
+import { BRAND, PRODUCT } from "@/lib/brand";
+import { DemoOnly, useDemoUI } from "./DemoUI";
 import { useStore } from "@/lib/store";
 import { waLink, waMessage } from "@/lib/whatsapp";
 
@@ -16,15 +17,19 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const { db } = useStore();
+  const demo = useDemoUI();
   const s = db.session;
   const wa = waLink(path);
   const [waOpen, setWaOpen] = useState(false);
   return (
     <>
-      <div className="bg-amber text-ink text-center text-xs sm:text-sm font-bold py-1.5 px-3">
-        Prototipo de demostración por 844 Digital · Datos ficticios ·{" "}
-        <Link href="/demo" className="underline">Recorrer la demo</Link>
-      </div>
+      <DemoOnly>
+        <div className="bg-amber text-ink text-center text-xs sm:text-sm font-bold py-1.5 px-3">
+          Prototipo de demostración por {PRODUCT.agency} · Datos ficticios ·{" "}
+          <Link href="/demo" className="underline">Guía de la demo</Link> ·{" "}
+          <button onClick={() => demo.set(false)} className="underline">Ocultar avisos</button>
+        </div>
+      </DemoOnly>
       <header className="sticky top-0 z-50 bg-ink/90 backdrop-blur-md border-b border-white/10">
         <div className="container-x flex items-center justify-between h-16">
           <Link href="/" aria-label="Inicio"><Logo /></Link>
@@ -60,7 +65,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           <div className="md:col-span-2">
             <Logo />
             <p className="mt-4 max-w-sm text-sm">Fisioterapia y rendimiento en Saltillo, Coahuila. Lesiones deportivas, dolor y rehabilitación.</p>
-            <p className="mt-4 text-xs">Este sitio es un prototipo comercial con datos ficticios. La información de contacto es de ejemplo.</p>
+            <DemoOnly><p className="mt-4 text-xs">Este sitio es un prototipo comercial con datos ficticios. La información de contacto es de ejemplo.</p></DemoOnly>
           </div>
           <div>
             <h4 className="font-display text-xl text-white uppercase font-bold mb-3">Explora</h4>
@@ -76,7 +81,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <div className="border-t border-white/10 py-5 text-center text-xs">
-          Diseño y desarrollo por <a className="text-amber font-bold" href="https://844digital.com" target="_blank" rel="noopener noreferrer">844 Digital</a> · Prototipo de demostración · Los resultados de la fisioterapia varían según cada persona.
+          Plataforma <b className="text-white">{PRODUCT.name}</b> por <a className="text-amber font-bold" href={PRODUCT.agencyUrl} target="_blank" rel="noopener noreferrer">{PRODUCT.agency}</a> · Los resultados de la fisioterapia varían según cada persona.
         </div>
       </footer>
       <div className="md:hidden fixed z-40 inset-x-0 bottom-0 bg-ink/95 backdrop-blur border-t border-white/10 p-3 grid grid-cols-2 gap-3 pb-[max(.75rem,env(safe-area-inset-bottom))]">

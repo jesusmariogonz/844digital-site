@@ -5,6 +5,7 @@ import { useStore } from "@/lib/store";
 import { Modal, FlagBadge } from "./ui";
 import { SlotPicker } from "./SlotPicker";
 import { BeforeVisit } from "./BeforeVisit";
+import { DemoOnly } from "./DemoUI";
 import { fmtTime, longDate, money } from "@/lib/dates";
 import type { Appointment } from "@/lib/types";
 
@@ -142,7 +143,7 @@ export function BookingFlow() {
                   <div><label className="label" htmlFor="ap">Teléfono / WhatsApp</label><input id="ap" type="tel" required className="input" value={acct.phone} onChange={(e) => setAcct({ ...acct, phone: e.target.value })} /></div>
                   <div><label className="label" htmlFor="apw">Contraseña</label><input id="apw" type="password" required className="input" value={acct.pass} onChange={(e) => setAcct({ ...acct, pass: e.target.value })} /></div>
                   {err && <p className="sm:col-span-2 text-red-600 text-sm font-semibold">{err}</p>}
-                  <p className="sm:col-span-2 text-xs text-slate-500">Demo: la cuenta vive solo en este navegador y la contraseña no se guarda.</p>
+                  <DemoOnly><p className="sm:col-span-2 text-xs text-slate-500">Demo: la cuenta vive solo en este navegador y la contraseña no se guarda.</p></DemoOnly>
                   <div className="sm:col-span-2 flex justify-between"><button type="button" className="btn btn-outline" onClick={() => setStep(0)}>Atrás</button><button className="btn btn-primary">Crear cuenta y continuar</button></div>
                 </form>
               ) : (
@@ -202,7 +203,7 @@ export function BookingFlow() {
                 <Link href="/cuenta" className="btn btn-primary">Ver mi recuperación</Link>
                 <Link href="/ingresar?admin=1" className="btn btn-blue">Ver cómo le llega a Erik →</Link>
               </div>
-              <p className="text-xs text-slate-500 mt-4">Demo: la cita ya aparece en la agenda del panel del fisioterapeuta.</p>
+              <DemoOnly><p className="text-xs text-slate-500 mt-4">Demo: la cita ya aparece en la agenda del panel del fisioterapeuta.</p></DemoOnly>
             </div>
           )}
         </div>

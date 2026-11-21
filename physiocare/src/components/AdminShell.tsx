@@ -4,6 +4,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Logo } from "./Logo";
 import { useStore } from "@/lib/store";
+import { DemoOnly } from "./DemoUI";
+import { PRODUCT } from "@/lib/brand";
 import { fmtTime, shortDate } from "@/lib/dates";
 
 const NAV = [
@@ -86,7 +88,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden lg:flex flex-col w-64 shrink-0 bg-ink p-4 sticky top-0 h-screen">
         <Link href="/admin" className="px-2 py-3"><Logo /></Link>
         <div className="mt-4 flex-1 overflow-auto">{nav}</div>
-        <div className="rounded-xl bg-white/5 p-3 text-xs text-white/60 mb-3">Sesión demo · datos ficticios<br />Prototipo de 844 Digital</div>
+        <div className="rounded-xl bg-white/5 p-3 text-xs text-white/60 mb-3"><DemoOnly><span>Sesión demo · datos ficticios<br /></span></DemoOnly>{PRODUCT.name} · {PRODUCT.agency}</div>
         <Link href="/" className="btn btn-ghost btn-sm mb-2">Ver sitio público</Link>
         <button className="btn btn-ghost btn-sm" onClick={() => { logout(); router.push("/"); }}>Cerrar sesión</button>
       </aside>
@@ -96,7 +98,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <button className="text-white text-2xl px-2" onClick={() => setOpen(!open)} aria-label="Menú del panel" aria-expanded={open}>☰</button>
         </header>
         {open && <div className="lg:hidden bg-ink p-4 sticky top-14 z-40 max-h-[75vh] overflow-auto">{nav}<button className="btn btn-ghost btn-sm w-full mt-3" onClick={() => { logout(); router.push("/"); }}>Cerrar sesión</button></div>}
-        <div className="bg-amber text-ink text-xs font-bold text-center py-1">Panel de demostración · datos ficticios · no se guarda información real</div>
+        <DemoOnly><div className="bg-amber text-ink text-xs font-bold text-center py-1">Panel de demostración · datos ficticios · no se guarda información real</div></DemoOnly>
         <main className="p-4 sm:p-8 max-w-7xl">{children}</main>
       </div>
     </div>
