@@ -46,7 +46,7 @@ export default function Preguntas() {
               const svc = db.services.find((s) => s.id === x.suggestedServiceId);
               const isOpen = open === x.id;
               return (
-                <article key={x.id} className="card p-5">
+                <article key={x.id} className="border-t border-ink pt-6 pb-8">
                   <div className="flex items-center gap-2 flex-wrap"><span className="chip bg-brand/10 text-brand">{x.topic}</span><span className="text-xs text-slate-500">por {x.author}</span></div>
                   <button className="text-left w-full" onClick={() => setOpen(isOpen ? null : x.id)} aria-expanded={isOpen}>
                     <h3 className="font-display text-2xl font-extrabold leading-tight mt-2">{x.title}</h3>
@@ -67,7 +67,7 @@ export default function Preguntas() {
                   )}
                   <div className="mt-4 flex items-center gap-3">
                     <button disabled={liked.includes(x.id)} onClick={() => { likeQuestion(x.id); setLiked([...liked, x.id]); }} className="btn btn-outline btn-sm">
-                      {liked.includes(x.id) ? "✓ Gracias" : "A mí también me pasa"} · {x.me2}
+                      {liked.includes(x.id) ? "Gracias" : "A mí también me pasa"} · {x.me2}
                     </button>
                     <button className="text-sm font-bold text-brand" onClick={() => setOpen(isOpen ? null : x.id)}>{isOpen ? "Ocultar" : "Ver respuesta"}</button>
                   </div>

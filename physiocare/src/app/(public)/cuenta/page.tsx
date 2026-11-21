@@ -106,7 +106,7 @@ export default function Cuenta() {
                 <ul className="mt-3 divide-y divide-mist">
                   {EXERCISES.map((e) => { const on = exDone.includes(e.id); return (
                     <li key={e.id}><button onClick={() => toggleExercise(e.id)} aria-pressed={on} className="w-full flex items-center gap-3 py-3 text-left">
-                      <span className={`size-7 rounded-full grid place-items-center border-2 font-bold ${on ? "bg-emerald-500 border-emerald-500 text-white" : "border-slate-300"}`}>{on ? "✓" : ""}</span>
+                      <span className={`size-6 border-2 ${on ? "bg-ink border-ink" : "border-slate-400"}`} aria-hidden="true">{on && <span className="block size-full scale-50 bg-amber" />}</span>
                       <span className="flex-1"><b className={on ? "line-through text-slate-400" : ""}>{e.name}</b><span className="block text-sm text-slate-500">{e.detail}</span></span>
                     </button></li>); })}
                 </ul>
@@ -170,7 +170,7 @@ export default function Cuenta() {
         {tab === "Documentos" && (
           <>
             <h2 className="font-display text-3xl font-extrabold uppercase">Documentos disponibles</h2>
-            {rec.archivos.length ? <div className="card divide-y divide-mist">{rec.archivos.map((f) => <div key={f} className="p-4 flex justify-between items-center"><span>📄 {f}</span><span className="chip bg-slate-100 text-slate-600">Ficticio · sin descarga</span></div>)}</div> : <Empty>Aún no hay documentos compartidos.</Empty>}
+            {rec.archivos.length ? <div className="card divide-y divide-mist">{rec.archivos.map((f) => <div key={f} className="p-4 flex justify-between items-center"><span>{f}</span><span className="chip bg-slate-100 text-slate-600">Ficticio · sin descarga</span></div>)}</div> : <Empty>Aún no hay documentos compartidos.</Empty>}
           </>
         )}
         {tab === "Perfil" && (
@@ -179,7 +179,7 @@ export default function Cuenta() {
             <div><label className="label">Correo</label><input className="input bg-slate-50" value={p.email} readOnly /></div>
             <div><label className="label" htmlFor="pt">Teléfono</label><input id="pt" name="phone" required className="input" defaultValue={p.phone} /></div>
             <div><label className="label" htmlFor="pb">Fecha de nacimiento</label><input id="pb" name="birth" type="date" className="input" defaultValue={p.birth} /></div>
-            <div className="sm:col-span-2 flex items-center gap-3"><button className="btn btn-primary">Guardar cambios</button>{saved && <span className="text-emerald-700 text-sm font-semibold">Guardado en la demo ✓</span>}</div>
+            <div className="sm:col-span-2 flex items-center gap-3"><button className="btn btn-primary">Guardar cambios</button>{saved && <span className="text-emerald-700 text-sm font-semibold">Guardado en la demo</span>}</div>
           </form>
         )}
         {tab === "Expediente" && (
@@ -187,7 +187,7 @@ export default function Cuenta() {
             <FlagBadge flag="proxima" dark />
             <h2 className="font-display text-4xl font-extrabold uppercase mt-3">Tu expediente digital</h2>
             <p className="text-white/75 mt-2">Cuando Erik habilite esta función, podrás consultar aquí un resumen de tu evolución. Requiere autenticación robusta, consentimiento y control de acceso antes de manejar información real.</p>
-            <div className="mt-5 rounded-xl bg-white/5 p-4 text-sm text-white/60">🔒 Acceso no habilitado en el prototipo. El expediente ficticio se muestra solo en el panel del fisioterapeuta.</div>
+            <div className="mt-5 rounded-xl bg-white/5 p-4 text-sm text-white/60">Acceso no habilitado en el prototipo. El expediente ficticio se muestra solo en el panel del fisioterapeuta.</div>
           </div>
         )}
       </div>

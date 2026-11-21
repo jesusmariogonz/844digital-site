@@ -69,9 +69,9 @@ export function Empty({ children }: { children: React.ReactNode }) {
 
 export function Stat({ label, value, hint, accent }: { label: string; value: string | number; hint?: string; accent?: boolean }) {
   return (
-    <div className={`card p-5 ${accent ? "!bg-ink !text-white" : ""}`}>
-      <div className={`text-xs font-bold uppercase tracking-wider ${accent ? "text-amber" : "text-slate-500"}`}>{label}</div>
-      <div className="font-display font-extrabold text-5xl leading-none mt-2">{value}</div>
+    <div className={`p-5 ${accent ? "bg-ink text-white" : "card"}`}>
+      <div className={`font-display text-sm font-bold uppercase tracking-[.16em] ${accent ? "text-amber" : "text-slate-500"}`}>{label}</div>
+      <div className="font-display font-extrabold text-6xl leading-none mt-2">{value}</div>
       {hint && <div className={`text-sm mt-2 ${accent ? "text-white/70" : "text-slate-500"}`}>{hint}</div>}
     </div>
   );
@@ -79,18 +79,18 @@ export function Stat({ label, value, hint, accent }: { label: string; value: str
 
 export function Img({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt={alt} loading="lazy" className={`w-full h-full object-cover ${className}`} />;
+  return <img src={src} alt={alt} loading="lazy" className={`photo w-full h-full object-cover ${className}`} />;
 }
 
 export function BackLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return <Link href={href} className="text-sm font-bold text-brand hover:underline">← {children}</Link>;
+  return <Link href={href} className="font-display text-base font-bold uppercase tracking-[.12em] ulink">{children}</Link>;
 }
 
 export function PageHead({ title, sub, flag, children }: { title: string; sub?: string; flag?: Flag; children?: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
       <div>
-        <h1 className="font-display text-5xl font-extrabold uppercase leading-none">{title}</h1>
+        <h1 className="font-display text-5xl sm:text-6xl font-extrabold uppercase leading-[.88]">{title}</h1>
         {sub && <p className="text-slate-600 mt-2 max-w-2xl">{sub}</p>}
         {flag && <div className="mt-2"><FlagBadge flag={flag} /></div>}
       </div>

@@ -18,6 +18,10 @@ npm run build    # compilación de producción
 npm run lint     # comprobación de tipos (tsc --noEmit)
 ```
 
+## Dirección visual
+
+Estilo **editorial deportivo**: papel cálido y tinta, un solo acento (ámbar), esquinas rectas, líneas finas en lugar de tarjetas, titulares enormes con cursiva serif como contraste, fotografía en blanco y negro con grano (el color vuelve al pasar el cursor) y sin iconos ni glifos decorativos. Los tokens están en `src/app/globals.css` (`@theme`); las fotos se cambian en `src/lib/images.ts`.
+
 ## Modo demostración (avisos)
 
 El sitio se ve **limpio** por defecto, como el producto terminado del cliente. Los avisos de prototipo (barra amarilla, etiquetas «Disponible en la demo» / «Integración pendiente», notas de datos ficticios) solo aparecen si se encienden:

@@ -76,7 +76,7 @@ export function BookingFlow() {
           ["Precio", service ? money(service.price) : null],
         ].map(([k, v]) => (
           <li key={k as string} className="flex items-start gap-3">
-            <span className={`mt-0.5 size-5 rounded-full grid place-items-center text-[.7rem] font-bold shrink-0 ${v && (k === "Servicio" || k === "Precio" || slot) ? "bg-emerald-500 text-white" : "bg-mist text-slate-400"}`}>{v && (k === "Servicio" || k === "Precio" || slot) ? "✓" : "·"}</span>
+            <span className={`mt-1.5 size-2.5 shrink-0 ${v && (k === "Servicio" || k === "Precio" || slot) ? "bg-amber" : "border border-slate-400"}`} aria-hidden="true" />
             <div><div className="text-xs uppercase font-bold text-slate-400">{k}</div><div className="font-semibold">{v && (k === "Servicio" || k === "Precio" || slot) ? v : "Por elegir"}</div></div>
           </li>
         ))}
@@ -191,7 +191,7 @@ export function BookingFlow() {
 
           {step === 4 && done && service && (
             <div className="text-center py-4">
-              <div className="size-20 rounded-full bg-emerald-100 text-emerald-600 grid place-items-center mx-auto text-4xl font-bold">✓</div>
+              <div className="mx-auto h-1.5 w-24 bg-amber" aria-hidden="true" />
               <h2 className="font-display text-5xl font-extrabold uppercase mt-4">Tu cita está {done.status === "confirmada" ? "confirmada" : "solicitada"}</h2>
               <p className="mt-2 text-lg">{service.name} · {longDate(done.date)} · {fmtTime(done.time)}</p>
               <div className="mt-6 grid sm:grid-cols-2 gap-3 text-left max-w-2xl mx-auto">
@@ -201,7 +201,7 @@ export function BookingFlow() {
               <div className="mt-6 max-w-2xl mx-auto text-left"><BeforeVisit /></div>
               <div className="mt-8 flex flex-wrap gap-3 justify-center">
                 <Link href="/cuenta" className="btn btn-primary">Ver mi recuperación</Link>
-                <Link href="/ingresar?admin=1" className="btn btn-blue">Ver cómo le llega a Erik →</Link>
+                <Link href="/ingresar?admin=1" className="btn btn-blue">Ver cómo le llega a Erik</Link>
               </div>
               <DemoOnly><p className="text-xs text-slate-500 mt-4">Demo: la cita ya aparece en la agenda del panel del fisioterapeuta.</p></DemoOnly>
             </div>

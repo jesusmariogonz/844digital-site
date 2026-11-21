@@ -62,7 +62,7 @@ export default function Resumen() {
               <div className="text-sm text-slate-500">{svc(a.serviceId)?.name} · {shortDate(a.date)} {fmtTime(a.time)}</div>
               <div className="mt-2 flex gap-2"><button className="btn btn-blue btn-sm" onClick={() => setApptStatus(a.id, "confirmada")}>Confirmar</button></div>
             </div>
-          )) : <Empty>Todo confirmado ✓</Empty>}
+          )) : <Empty>Todo confirmado</Empty>}
         </section>
       </div>
 

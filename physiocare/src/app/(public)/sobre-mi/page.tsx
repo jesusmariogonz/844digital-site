@@ -43,7 +43,7 @@ export default function SobreMi() {
               {lists.map(([t, items]) => (
                 <div key={t} className="card p-5">
                   <h2 className="font-display text-2xl font-extrabold uppercase">{t}</h2>
-                  <ul className="mt-2 space-y-1.5 text-sm text-slate-700">{items.map((i) => <li key={i} className="flex gap-2"><span className="text-brand font-bold">✓</span>{i}</li>)}</ul>
+                  <ul className="mt-2 space-y-1.5 text-sm text-slate-700">{items.map((i) => <li key={i} className="flex gap-3 border-b border-mist pb-1.5"><span className="text-amber font-bold">—</span>{i}</li>)}</ul>
                 </div>
               ))}
             </div>

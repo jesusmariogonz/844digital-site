@@ -81,7 +81,7 @@ export default function PacienteDetalle() {
             {([["Antecedentes", rec.antecedentes], ["Motivo de consulta", rec.motivo], ["Evaluación inicial", rec.evaluacion], ["Valoración profesional", rec.valoracion], ["Plan de tratamiento", rec.plan]] as [string, string][]).map(([t, v]) => (
               <section key={t} className="card p-5"><h3 className="font-display text-2xl font-extrabold uppercase">{t}</h3><p className="text-slate-700 mt-1">{v}</p></section>
             ))}
-            <section className="card p-5"><h3 className="font-display text-2xl font-extrabold uppercase">Archivos adjuntos</h3>{rec.archivos.length ? <ul className="mt-2 space-y-1 text-sm">{rec.archivos.map((f) => <li key={f}>📎 {f}</li>)}</ul> : <p className="text-slate-500 text-sm mt-1">Sin archivos.</p>}</section>
+            <section className="card p-5"><h3 className="font-display text-2xl font-extrabold uppercase">Archivos adjuntos</h3>{rec.archivos.length ? <ul className="mt-2 space-y-1 text-sm">{rec.archivos.map((f) => <li key={f} className="border-b border-mist pb-1">{f}</li>)}</ul> : <p className="text-slate-500 text-sm mt-1">Sin archivos.</p>}</section>
           </div>
           <section className="card p-5">
             <h3 className="font-display text-2xl font-extrabold uppercase mb-3">Historial de sesiones</h3>
