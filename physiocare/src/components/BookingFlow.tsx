@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useStore } from "@/lib/store";
 import { Modal, FlagBadge } from "./ui";
 import { SlotPicker } from "./SlotPicker";
+import { BeforeVisit } from "./BeforeVisit";
 import { fmtTime, longDate, money } from "@/lib/dates";
 import type { Appointment } from "@/lib/types";
 
@@ -196,6 +197,7 @@ export function BookingFlow() {
                 <div className="rounded-2xl bg-slate-50 p-4 text-sm"><b>Correo (simulado)</b><br />Enviamos el detalle de tu cita a {patient?.email}.</div>
                 <div className="rounded-2xl bg-slate-50 p-4 text-sm"><b>WhatsApp (simulado)</b><br />Recibirás recordatorios 24 horas antes y el mismo día.</div>
               </div>
+              <div className="mt-6 max-w-2xl mx-auto text-left"><BeforeVisit /></div>
               <div className="mt-8 flex flex-wrap gap-3 justify-center">
                 <Link href="/cuenta" className="btn btn-primary">Ver mi recuperación</Link>
                 <Link href="/ingresar?admin=1" className="btn btn-blue">Ver cómo le llega a Erik →</Link>

@@ -4,11 +4,12 @@ import { useStore } from "@/lib/store";
 import { IMG } from "@/lib/images";
 import { Img } from "@/components/ui";
 import { ServiceCard, SectionHead } from "@/components/cards";
-import { PROFILE } from "@/lib/seed";
+import { PROFILE, BRAND } from "@/lib/seed";
 
 export default function Home() {
   const { db } = useStore();
   const services = db.services.filter((s) => s.active).slice(0, 4);
+  const reels = db.content.filter((c) => c.published && c.type === "instagram" && c.url).slice(0, 3);
   const qs = db.questions.filter((q) => q.status === "publicada").sort((a, b) => b.me2 - a.me2).slice(0, 3);
   return (
     <>
@@ -58,7 +59,7 @@ export default function Home() {
           Cada plan parte de una valoración. Los resultados varían en cada persona.
         </SectionHead>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">{services.map((s) => <ServiceCard key={s.id} s={s} />)}</div>
-        <div className="mt-8 text-center"><Link href="/servicios" className="btn btn-outline">Ver todos los servicios</Link></div>
+        <div className="mt-8 flex flex-wrap justify-center gap-3"><Link href="/servicios#asistente" className="btn btn-blue">¿Cuál necesito?</Link><Link href="/servicios" className="btn btn-outline">Ver todos los servicios</Link></div>
       </section>
 
       {/* SOBRE ERIK */}
@@ -81,6 +82,30 @@ export default function Home() {
               <Link href="/agendar?servicio=s_eval" className="btn btn-primary">Agendar valoración</Link>
               <Link href="/sobre-mi" className="btn btn-ghost">Conoce más</Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* DE INSTAGRAM AL CONSULTORIO */}
+      <section className="container-x mt-24" aria-labelledby="ig-t">
+        <div className="rounded-[2rem] bg-ink text-white overflow-hidden grid lg:grid-cols-5">
+          <div className="lg:col-span-2 p-8 sm:p-10 flex flex-col justify-center">
+            <div className="eyebrow !text-amber">Instagram → Consultorio</div>
+            <h2 id="ig-t" className="section-title mt-2">De Instagram al consultorio</h2>
+            <p className="mt-4 text-white/80 text-lg">Contenido que ya ayuda a miles de personas. Ahora también puedes agendar tu valoración.</p>
+            <div className="mt-5 flex items-center gap-3"><span className="font-display text-5xl font-extrabold text-amber leading-none">{PROFILE.followers}</span><span className="text-white/70 text-sm leading-tight">seguidores en<br />{BRAND.igHandle}</span></div>
+            <ul className="mt-5 flex flex-wrap gap-2" aria-label="Temas">{["Mitos", "Dolor", "Ejercicios"].map((t) => <li key={t} className="chip bg-white/10 border border-white/15">{t}</li>)}</ul>
+            <div className="mt-7 flex flex-wrap gap-3"><Link href="/agendar?servicio=s_eval" className="btn btn-primary">Agendar valoración</Link><a href={BRAND.instagram} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">Seguir en Instagram</a></div>
+          </div>
+          <div className="lg:col-span-3 p-6 sm:p-8 grid grid-cols-3 gap-3 sm:gap-4 content-center bg-ink-2">
+            {reels.map((c) => (
+              <a key={c.id} href={c.url} target="_blank" rel="noopener noreferrer" className="relative rounded-2xl overflow-hidden aspect-[9/16] zoom block group">
+                <Img src={c.image} alt={c.title} />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent" />
+                <span className="absolute top-2 right-2 chip bg-ink/80 text-white !px-2">Reel</span>
+                <div className="absolute inset-x-0 bottom-0 p-3"><div className="font-display text-lg sm:text-xl font-extrabold uppercase leading-none">{c.title}</div><div className="text-[.7rem] text-amber font-bold mt-1">{c.category}</div></div>
+              </a>
+            ))}
           </div>
         </div>
       </section>
