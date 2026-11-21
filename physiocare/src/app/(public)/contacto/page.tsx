@@ -4,15 +4,17 @@ import Link from "next/link";
 import { BRAND } from "@/lib/seed";
 import { FlagBadge } from "@/components/ui";
 import { SectionHead } from "@/components/cards";
+import { BeforeVisit } from "@/components/BeforeVisit";
+import { waLink } from "@/lib/whatsapp";
 
 const HOURS = [["Lunes a viernes", "9:00 – 14:00 y 15:00 – 19:00"], ["Sábado", "9:00 – 13:00"], ["Domingo", "Cerrado"]];
 
 export default function Contacto() {
   const [sent, setSent] = useState(false);
-  const wa = `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent("Hola Erik, tengo una duda.")}`;
+  const wa = waLink("/contacto");
   return (
     <div className="container-x pt-14">
-      <SectionHead h1 eyebrow="Agenda y contacto" title="Hablemos">Datos de contacto de ejemplo; se reemplazan por los reales al configurar el sitio.</SectionHead>
+      <SectionHead h1 eyebrow="Agenda y contacto" title="Hablemos">Escríbeme o agenda en línea.</SectionHead>
       <div className="grid lg:grid-cols-2 gap-8">
         <div className="space-y-4">
           <div className="card p-6">
@@ -26,6 +28,7 @@ export default function Contacto() {
             <a href={`tel:${BRAND.phone.replace(/\s/g, "")}`} className="btn btn-outline">Llamar {BRAND.phone}</a>
             <Link href="/agendar?servicio=s_eval" className="btn btn-primary">Agendar valoración</Link>
           </div>
+          <BeforeVisit cta />
           <div className="card overflow-hidden">
             <iframe title="Mapa de Saltillo, Coahuila" loading="lazy" className="w-full h-72 border-0" src="https://www.google.com/maps?q=Saltillo,+Coahuila&output=embed" referrerPolicy="no-referrer-when-downgrade" />
             <div className="p-4 text-sm flex items-center justify-between gap-2 flex-wrap"><span>{BRAND.address}</span><FlagBadge flag="config" /></div>

@@ -4,7 +4,7 @@ import type { Appointment, ApptStatus, Block, ContentItem, DB, MediaFile, Notice
 import { BRAND, makeSeed } from "./seed";
 import { fmtTime, longDate, todayStr, uid } from "./dates";
 
-const KEY = "efr-demo-v1";
+const KEY = "efr-demo-v2"; // v2: contenido y categorías nuevas del bloque 2
 const SKEY = "efr-session-v1"; // la sesión es por pestaña (sessionStorage): paciente y Erik pueden estar abiertos a la vez
 const GUEST = { role: "guest" } as const;
 

@@ -7,6 +7,7 @@ import { Empty, FlagBadge, Modal, PayChip, StatusChip } from "@/components/ui";
 import { SlotPicker } from "@/components/SlotPicker";
 import { recordFor, EXERCISES, PLAN_SESSIONS } from "@/lib/seed";
 import { Evolution } from "@/components/Evolution";
+import { BeforeVisit } from "@/components/BeforeVisit";
 import { fmtTime, longDate, money, shortDate, todayStr } from "@/lib/dates";
 
 const TABS = ["Mi recuperación", "Mis citas", "Pagos", "Documentos", "Perfil", "Expediente"] as const;
@@ -119,6 +120,8 @@ export default function Cuenta() {
               <div className="flex items-center gap-2 flex-wrap"><h2 className="font-display text-3xl font-extrabold uppercase">Tu evolución</h2><span className="chip bg-slate-100 text-slate-600">Datos ficticios</span></div>
               <div className="mt-4 max-w-2xl"><Evolution sesiones={rec.sesiones} /></div>
             </section>
+
+            {upcoming.length > 0 && <BeforeVisit />}
 
             <h2 className="font-display text-3xl font-extrabold uppercase pt-2">Próximas citas</h2>
             {upcoming.length ? upcoming.map((a) => <ApptRow key={a.id} a={a} actions />) : <Empty>No tienes citas próximas.</Empty>}

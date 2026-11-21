@@ -29,8 +29,8 @@ export default function Preguntas() {
 
   return (
     <div className="container-x pt-14">
-      <SectionHead h1 eyebrow="Comunidad" title="Pregúntale a Erik">
-        Haz tu pregunta y Erik la responde. Todas pasan por su aprobación antes de publicarse. Información general: no sustituye una valoración.
+      <SectionHead h1 eyebrow="Comunidad" title="La comunidad pregunta. Erik responde.">
+        Envía tu pregunta. Erik la revisa antes de publicarla.
       </SectionHead>
 
       <div className="grid lg:grid-cols-3 gap-8 items-start">
@@ -55,13 +55,14 @@ export default function Preguntas() {
                     <div className="mt-3 reveal">
                       <p className="text-slate-500 text-sm italic">“{x.body}”</p>
                       <div className="mt-3 rounded-2xl bg-ink text-white p-5">
-                        <div className="text-xs font-bold uppercase tracking-wider text-amber mb-1">Respuesta de Erik</div>
+                        <div className="flex items-center gap-3 mb-2"><span className="size-9 rounded-full bg-amber text-ink grid place-items-center font-display font-extrabold">EF</span><div className="leading-tight"><div className="font-bold">Erik Esqueda</div><div className="text-xs text-white/60">Fisioterapeuta</div></div></div>
                         <p className="text-white/90">{x.answer}</p>
                       </div>
                       <p className="text-xs text-slate-500 mt-2">Si presentas debilidad que avanza, pérdida de control de esfínteres, dolor en el pecho o fiebre con dolor intenso, acude a urgencias.</p>
-                      {svc && (
-                        <Link href={`/agendar?servicio=${svc.id}&origen=foro`} className="btn btn-primary btn-sm mt-3">Agendar: {svc.name}</Link>
-                      )}
+                      <div className="mt-4 rounded-2xl bg-brand/10 border border-brand/20 p-4 flex flex-wrap items-center justify-between gap-3">
+                        <div><b className="font-display text-2xl uppercase">¿Quieres saber qué está pasando en tu caso?</b><div className="text-sm text-slate-600">Cada caso es distinto: una valoración lo aclara.</div></div>
+                        <Link href={`/agendar?servicio=${svc?.id ?? "s_eval"}&origen=foro`} className="btn btn-primary">Agenda una valoración</Link>
+                      </div>
                     </div>
                   )}
                   <div className="mt-4 flex items-center gap-3">

@@ -7,22 +7,32 @@ import { SectionHead } from "@/components/cards";
 import { Player } from "@/components/Player";
 import type { ContentItem } from "@/lib/types";
 
-const TABS = [["todo", "Todo"], ["video", "Videos"], ["instagram", "Instagram"], ["consejo", "Consejos"], ["novedad", "Novedades"]] as const;
+// Pestañas por tipo (Videos, Instagram) y por tema (Ejercicios, Dolor, Lesiones, Mitos)
+const TABS: [string, string, (c: ContentItem) => boolean][] = [
+  ["todo", "Todos", () => true],
+  ["video", "Videos", (c) => c.type === "video"],
+  ["instagram", "Instagram", (c) => c.type === "instagram"],
+  ["ejercicios", "Ejercicios", (c) => c.category.toLowerCase().startsWith("ejercicio")],
+  ["dolor", "Dolor", (c) => c.category.toLowerCase() === "dolor"],
+  ["lesiones", "Lesiones", (c) => c.category.toLowerCase().startsWith("lesion") || c.category.toLowerCase().startsWith("lesión")],
+  ["mitos", "Mitos", (c) => c.category.toLowerCase().startsWith("mito")],
+];
 const LABEL: Record<string, string> = { video: "Video", instagram: "Instagram", consejo: "Consejo", novedad: "Novedad" };
 
 export default function Aprende() {
   const { db } = useStore();
-  const [tab, setTab] = useState<string>("todo");
+  const [tab, setTab] = useState("todo");
   const [q, setQ] = useState("");
   const pub = db.content.filter((c) => c.published);
   const featured = pub.find((c) => c.featured && c.type === "video") ?? pub.find((c) => c.type === "video");
+  const match = TABS.find((t) => t[0] === tab)![2];
   const list = useMemo(
-    () => pub.filter((c) => (tab === "todo" || c.type === tab) && (c.title + c.description + c.category).toLowerCase().includes(q.toLowerCase())),
-    [pub, tab, q],
+    () => pub.filter((c) => match(c) && (c.title + c.description + c.category).toLowerCase().includes(q.toLowerCase())),
+    [pub, match, q],
   );
   return (
     <div className="container-x pt-14">
-      <SectionHead h1 eyebrow="Biblioteca" title="Aprende y conoce">Videos, consejos de movilidad, Reels y novedades del consultorio. Información general: no sustituye una valoración profesional.</SectionHead>
+      <SectionHead h1 eyebrow="Biblioteca" title="Aprende sobre tu cuerpo">Videos, ejercicios y consejos. Información general, no sustituye una valoración.</SectionHead>
 
       {featured && (
         <div className="card-dark overflow-hidden grid lg:grid-cols-5 mb-12">
@@ -30,16 +40,19 @@ export default function Aprende() {
           <div className="lg:col-span-2 p-6 sm:p-8 flex flex-col justify-center">
             <span className="chip bg-amber text-ink self-start">Video destacado</span>
             <h2 className="font-display text-4xl font-extrabold uppercase leading-none mt-3">{featured.title}</h2>
-            <p className="text-white/70 mt-3">{featured.description}</p>
-            <Link href="/agendar?servicio=s_eval" className="btn btn-primary mt-6 self-start">Agendar valoración</Link>
+            <div className="mt-6 rounded-2xl bg-white/10 p-5">
+              <h3 className="font-display text-2xl font-extrabold uppercase text-amber">¿Tienes este problema?</h3>
+              <p className="text-white/80 mt-1">Conoce cómo abordarlo y cuándo es recomendable acudir a valoración.</p>
+              <Link href="/agendar?servicio=s_eval" className="btn btn-primary mt-4">Agendar valoración</Link>
+            </div>
           </div>
         </div>
       )}
 
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div className="scroll-x flex gap-2" role="tablist">
+        <div className="scroll-x flex gap-2 max-w-full" role="tablist">
           {TABS.map(([k, l]) => (
-            <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`btn btn-sm ${tab === k ? "btn-blue" : "btn-outline"}`}>{l}</button>
+            <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`btn btn-sm shrink-0 ${tab === k ? "btn-blue" : "btn-outline"}`}>{l}</button>
           ))}
         </div>
         <input className="input !w-auto flex-1 min-w-48 !py-2" placeholder="Buscar tema…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar" />

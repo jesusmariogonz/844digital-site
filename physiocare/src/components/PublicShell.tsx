@@ -5,10 +5,11 @@ import { useState } from "react";
 import { Logo } from "./Logo";
 import { BRAND } from "@/lib/seed";
 import { useStore } from "@/lib/store";
+import { waLink, waMessage } from "@/lib/whatsapp";
 
 const NAV = [
   ["/", "Inicio"], ["/sobre-mi", "Sobre mí"], ["/servicios", "Servicios"],
-  ["/aprende", "Aprende y conoce"], ["/preguntas", "Pregúntale a Erik"], ["/contacto", "Contacto"],
+  ["/aprende", "Aprende"], ["/preguntas", "Pregúntale a Erik"], ["/contacto", "Contacto"],
 ] as const;
 
 export function PublicShell({ children }: { children: React.ReactNode }) {
@@ -16,7 +17,8 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const { db } = useStore();
   const s = db.session;
-  const wa = `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent("Hola Erik, quiero agendar una cita.")}`;
+  const wa = waLink(path);
+  const [waOpen, setWaOpen] = useState(false);
   return (
     <>
       <div className="bg-amber text-ink text-center text-xs sm:text-sm font-bold py-1.5 px-3">
@@ -81,9 +83,18 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
         <a href={wa} target="_blank" rel="noopener noreferrer" className="btn !bg-[#25d366] !text-ink">WhatsApp</a>
         <Link href="/agendar?servicio=s_eval" className="btn btn-primary">Agendar valoración</Link>
       </div>
-      <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="Escribir por WhatsApp" className="hidden md:grid fixed z-40 bottom-5 right-5 size-14 rounded-full bg-[#25d366] place-items-center shadow-xl pulse-ring hover:scale-110 transition">
-        <svg viewBox="0 0 32 32" className="size-8 fill-white" aria-hidden="true"><path d="M16 3C9 3 3.3 8.6 3.3 15.5c0 2.3.7 4.5 1.8 6.3L3 29l7.4-1.9a12.9 12.9 0 0 0 5.6 1.3c7 0 12.7-5.600 12.7-12.500S23 3 16 3zm0 23.300c-1.800 0-3.600-.5-5.100-1.400l-.4-.2-4.400 1.100 1.200-4.200-.3-.4a10.400 10.400 0 0 1-1.600-5.600C5.400 9.800 10.100 5.200 16 5.200S26.600 9.800 26.600 15.600 21.900 26.300 16 26.300zm5.800-7.800c-.3-.2-1.900-.9-2.200-1s-.5-.2-.7.200-.8 1-1 1.200-.4.200-.7.100a8.700 8.700 0 0 1-4.300-3.800c-.3-.6.300-.5.900-1.700.1-.2 0-.4 0-.5l-1-2.300c-.3-.6-.5-.5-.7-.5h-.6a1.200 1.200 0 0 0-.9.400 3.700 3.700 0 0 0-1.100 2.700 6.400 6.400 0 0 0 1.400 3.400c.2.200 2.400 3.700 5.800 5.100 2.200.9 3 .9 4 .8.600-.1 1.900-.8 2.200-1.600s.3-1.400.2-1.600-.3-.3-.7-.5z"/></svg>
-      </a>
+      <div className="hidden md:block fixed z-40 bottom-5 right-5">
+        {waOpen && (
+          <div role="dialog" aria-label="Ayuda por WhatsApp" className="absolute bottom-[4.5rem] right-0 w-80 rounded-2xl bg-white shadow-2xl border border-mist overflow-hidden reveal">
+            <div className="bg-[#075e54] text-white px-4 py-3 flex items-center justify-between"><b>¿Necesitas ayuda?</b><button onClick={() => setWaOpen(false)} aria-label="Cerrar" className="text-xl leading-none">×</button></div>
+            <div className="p-4 bg-[#efeae2]"><div className="rounded-xl rounded-tl-none bg-white p-3 text-sm shadow-sm">{waMessage(path)}</div></div>
+            <div className="p-3"><a href={wa} target="_blank" rel="noopener noreferrer" className="btn !bg-[#25d366] !text-ink w-full">Abrir WhatsApp</a></div>
+          </div>
+        )}
+        <button onClick={() => setWaOpen(!waOpen)} aria-expanded={waOpen} aria-label="Ayuda por WhatsApp" className="size-14 rounded-full bg-[#25d366] grid place-items-center shadow-xl pulse-ring hover:scale-110 transition">
+          <svg viewBox="0 0 32 32" className="size-8 fill-white" aria-hidden="true"><path d="M16 3C9 3 3.3 8.6 3.3 15.5c0 2.3.7 4.5 1.8 6.3L3 29l7.4-1.9a12.9 12.9 0 0 0 5.6 1.3c7 0 12.7-5.600 12.7-12.500S23 3 16 3zm0 23.300c-1.800 0-3.600-.5-5.100-1.400l-.4-.2-4.400 1.100 1.200-4.200-.3-.4a10.400 10.400 0 0 1-1.600-5.600C5.400 9.800 10.100 5.200 16 5.200S26.600 9.800 26.600 15.600 21.900 26.300 16 26.300zm5.800-7.800c-.3-.2-1.900-.9-2.200-1s-.5-.2-.7.200-.8 1-1 1.200-.4.200-.7.100a8.700 8.700 0 0 1-4.300-3.800c-.3-.6.300-.5.900-1.700.1-.2 0-.4 0-.5l-1-2.300c-.3-.6-.5-.5-.7-.5h-.6a1.200 1.200 0 0 0-.9.400 3.700 3.700 0 0 0-1.100 2.700 6.400 6.400 0 0 0 1.400 3.400c.2.200 2.400 3.700 5.800 5.100 2.200.9 3 .9 4 .8.600-.1 1.900-.8 2.200-1.600s.3-1.400.2-1.600-.3-.3-.7-.5z"/></svg>
+        </button>
+      </div>
     </>
   );
 }
