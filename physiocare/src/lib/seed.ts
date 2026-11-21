@@ -29,8 +29,15 @@ export const PROFILE = {
   certifications: [] as string[],
   experience: [] as string[],
   philosophy: "",
-  reviews: [] as { name: string; text: string; stars: number }[], // solo reseñas reales y autorizadas
-  reviewsRating: "", // ej. "4.9"
+  // Reseñas de EJEMPLO para la demo. Al tener reseñas reales y autorizadas: sustituir la lista,
+  // poner reviewsAreDemo en false y capturar la calificación real.
+  reviewsAreDemo: true,
+  reviewsRating: "4.9",
+  reviews: [
+    { name: "Paciente de ejemplo", detail: "Corredor recreativo", text: "Llegué con dolor en la rodilla y salí con un plan claro. Me explicó todo sin tecnicismos y me fue guiando paso a paso.", stars: 5 },
+    { name: "Paciente de ejemplo", detail: "Entrenamiento de fuerza", text: "Muy buena atención. Se nota que sabe de rendimiento: me ayudó a volver al gimnasio con confianza y sin prisas.", stars: 5 },
+    { name: "Paciente de ejemplo", detail: "Trabajo de oficina", text: "Agendar fue facilísimo desde el celular y los recordatorios por WhatsApp me ayudaron mucho. Excelente trato.", stars: 5 },
+  ] as { name: string; detail: string; text: string; stars: number }[],
 };
 
 export const SERVICES: Service[] = [

@@ -100,19 +100,29 @@ export default function Home() {
         </div>
       </section>
 
-      {/* RESEÑAS: solo se muestran reseñas reales y autorizadas */}
+      {/* RESEÑAS: de ejemplo mientras no existan reseñas reales y autorizadas */}
       {PROFILE.reviews.length > 0 && (
         <section className="container-x mt-24">
-          <SectionHead eyebrow="Reseñas" title="Lo que dicen mis pacientes">{PROFILE.reviewsRating && `${PROFILE.reviewsRating} / 5 en Google`}</SectionHead>
+          <div className="max-w-3xl mb-10">
+            <div className="eyebrow">Reseñas</div>
+            <h2 className="section-title mt-2">Lo que dicen mis pacientes</h2>
+            <div className="mt-4 flex items-center gap-3 flex-wrap">
+              {PROFILE.reviewsRating && (
+                <div className="flex items-center gap-2"><span className="font-display text-5xl font-extrabold leading-none">{PROFILE.reviewsRating}</span><span><span className="text-amber text-xl block leading-none" aria-hidden="true">★★★★★</span><span className="text-sm text-slate-500">de 5 en reseñas</span></span></div>
+              )}
+              {PROFILE.reviewsAreDemo && <span className="chip bg-slate-100 text-slate-600">Reseñas de ejemplo (demo)</span>}
+            </div>
+          </div>
           <div className="grid md:grid-cols-3 gap-5">
-            {PROFILE.reviews.map((r) => (
-              <figure key={r.name} className="card p-6">
-                <div className="text-amber text-xl" aria-label={`${r.stars} estrellas`}>{"★".repeat(r.stars)}</div>
+            {PROFILE.reviews.map((r, i) => (
+              <figure key={i} className="card p-6 hover-lift">
+                <div className="text-amber text-xl" role="img" aria-label={`${r.stars} de 5 estrellas`}>{"★".repeat(r.stars)}</div>
                 <blockquote className="mt-3 text-lg">“{r.text}”</blockquote>
-                <figcaption className="mt-4 text-sm text-slate-500"><b className="text-ink">{r.name}</b></figcaption>
+                <figcaption className="mt-4 text-sm text-slate-500"><b className="text-ink">{r.name}</b> · {r.detail}</figcaption>
               </figure>
             ))}
           </div>
+          {PROFILE.reviewsAreDemo && <p className="mt-4 text-xs text-slate-500">Reseñas ficticias de demostración. Se sustituyen por reseñas reales de pacientes, con su autorización.</p>}
         </section>
       )}
 
