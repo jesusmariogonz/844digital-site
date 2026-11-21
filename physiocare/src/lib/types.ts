@@ -132,4 +132,5 @@ export interface DB {
   audit: AuditEntry[];
   media: MediaFile[];
   session: Session;
+  exDone?: string[];
 }

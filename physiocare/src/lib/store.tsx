@@ -5,6 +5,8 @@ import { BRAND, makeSeed } from "./seed";
 import { fmtTime, longDate, todayStr, uid } from "./dates";
 
 const KEY = "efr-demo-v1";
+const SKEY = "efr-session-v1"; // la sesión es por pestaña (sessionStorage): paciente y Erik pueden estar abiertos a la vez
+const GUEST = { role: "guest" } as const;
 
 export interface BookInput {
   patientId: string;
@@ -40,6 +42,7 @@ interface Ctx {
   submitQuestion: (q: Pick<Question, "topic" | "title" | "body" | "author">) => void;
   updateQuestion: (id: string, patch: Partial<Question>) => void;
   likeQuestion: (id: string) => void;
+  toggleExercise: (id: string) => void;
   audit: (action: string, target: string) => void;
   resetDemo: () => void;
 }
@@ -59,16 +62,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let loaded: DB | null = null;
+    let session: DB["session"] = { ...GUEST };
     try {
       const raw = localStorage.getItem(KEY);
       if (raw) loaded = JSON.parse(raw) as DB;
+      const sraw = sessionStorage.getItem(SKEY);
+      if (sraw) session = JSON.parse(sraw);
     } catch {}
-    setDb(loaded ?? makeSeed(todayStr()));
+    setDb({ ...(loaded ?? makeSeed(todayStr())), session });
     setReady(true);
     const onStorage = (e: StorageEvent) => {
       if (e.key === KEY && e.newValue) {
         skipSave.current = true;
-        try { setDb(JSON.parse(e.newValue) as DB); } catch {}
+        try { const next = JSON.parse(e.newValue) as DB; setDb((cur) => ({ ...next, session: cur.session })); } catch {}
       }
     };
     window.addEventListener("storage", onStorage);
@@ -78,8 +84,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!ready) return;
     if (skipSave.current) { skipSave.current = false; return; }
-    try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {}
+    try { localStorage.setItem(KEY, JSON.stringify({ ...db, session: GUEST })); } catch {}
   }, [db, ready]);
+
+  useEffect(() => {
+    if (!ready) return;
+    try { sessionStorage.setItem(SKEY, JSON.stringify(db.session)); } catch {}
+  }, [db.session, ready]);
 
   const mut = useCallback((fn: (d: DB) => DB) => setDb((d) => fn(d)), []);
 
@@ -179,8 +190,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }),
     updateQuestion: (id, patch) => mut((d) => ({ ...d, questions: d.questions.map((q) => (q.id === id ? { ...q, ...patch } : q)) })),
     likeQuestion: (id) => mut((d) => ({ ...d, questions: d.questions.map((q) => (q.id === id ? { ...q, me2: q.me2 + 1 } : q)) })),
+    toggleExercise: (id) => mut((d) => { const cur = d.exDone ?? []; return { ...d, exDone: cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id] }; }),
     audit: (action, target) => mut((d) => ({ ...d, audit: [{ id: uid("au"), at: new Date().toISOString(), actor: "Erik (admin demo)", action, target }, ...d.audit].slice(0, 100) })),
-    resetDemo: () => { skipSave.current = false; setDb(makeSeed(todayStr())); },
+    resetDemo: () => { skipSave.current = false; setDb((cur) => ({ ...makeSeed(todayStr()), session: cur.session })); },
   }), [db, ready, mut]);
 
   return <StoreCtx.Provider value={api}>{children}</StoreCtx.Provider>;

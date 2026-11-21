@@ -47,7 +47,7 @@ export default function Resumen() {
             <div className="divide-y divide-mist">
               {todayList.map((a) => (
                 <div key={a.id} className="py-3 flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex items-center gap-4"><div className="font-display text-3xl font-extrabold w-24">{fmtTime(a.time)}</div><div><b>{pat(a.patientId)?.name}</b><div className="text-sm text-slate-500">{svc(a.serviceId)?.name}{a.reason ? ` · ${a.reason}` : ""}</div></div></div>
+                  <div className="flex items-center gap-4"><div className="font-display text-3xl font-extrabold w-36 shrink-0 whitespace-nowrap">{fmtTime(a.time)}</div><div><b>{pat(a.patientId)?.name}</b><div className="text-sm text-slate-500">{svc(a.serviceId)?.name}{a.reason ? ` · ${a.reason}` : ""}</div></div></div>
                   <div className="flex items-center gap-2"><StatusChip s={a.status} /><PayChip s={a.pay} /></div>
                 </div>
               ))}
@@ -58,7 +58,7 @@ export default function Resumen() {
           <h2 className="font-display text-3xl font-extrabold uppercase mb-3">Por confirmar</h2>
           {pending.length ? pending.slice(0, 5).map((a) => (
             <div key={a.id} className="py-3 border-b border-mist last:border-0">
-              <div className="font-semibold">{pat(a.patientId)?.name}</div>
+              <div className="font-semibold">{pat(a.patientId)?.name}{Date.now() - new Date(a.createdAt).getTime() < 600000 && <span className="chip bg-amber text-ink ml-2">Nueva</span>}</div>
               <div className="text-sm text-slate-500">{svc(a.serviceId)?.name} · {shortDate(a.date)} {fmtTime(a.time)}</div>
               <div className="mt-2 flex gap-2"><button className="btn btn-blue btn-sm" onClick={() => setApptStatus(a.id, "confirmada")}>Confirmar</button></div>
             </div>

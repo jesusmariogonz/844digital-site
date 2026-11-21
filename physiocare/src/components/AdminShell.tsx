@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Logo } from "./Logo";
 import { useStore } from "@/lib/store";
+import { fmtTime, shortDate } from "@/lib/dates";
 
 const NAV = [
   ["/admin", "Resumen", "▦"], ["/admin/agenda", "Agenda", "◷"], ["/admin/pacientes", "Pacientes", "☺"],
@@ -18,6 +19,24 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const { db, ready, logout, loginAs } = useStore();
   const [open, setOpen] = useState(false);
   const pending = db.questions.filter((q) => q.status === "pendiente").length;
+
+  // Aviso en vivo: cuando entra una cita nueva (de otra pestaña o del sitio) aparece una tarjeta.
+  const seen = useRef<Set<string> | null>(null);
+  const [toast, setToast] = useState<{ id: string; who: string; what: string; when: string } | null>(null);
+  useEffect(() => {
+    if (!ready) return;
+    const ids = new Set(db.appointments.map((a) => a.id));
+    if (seen.current) {
+      const fresh = db.appointments.find((a) => !seen.current!.has(a.id) && a.source !== "manual");
+      if (fresh) {
+        const p = db.patients.find((x) => x.id === fresh.patientId);
+        const sv = db.services.find((x) => x.id === fresh.serviceId);
+        setToast({ id: fresh.id, who: p?.name.split(" (")[0] ?? "Paciente", what: sv?.name ?? "Cita", when: `${shortDate(fresh.date)} · ${fmtTime(fresh.time)}` });
+      }
+    }
+    seen.current = ids;
+  }, [db.appointments, db.patients, db.services, ready]);
+  useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(null), 9000); return () => clearTimeout(t); }, [toast]);
 
   if (!ready) return <div className="min-h-screen bg-bone grid place-items-center text-slate-500">Cargando panel…</div>;
   if (db.session.role !== "admin") {
@@ -50,6 +69,20 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen lg:flex bg-bone">
+      {toast && (
+        <div role="status" aria-live="polite" className="fixed z-[90] top-4 right-4 left-4 sm:left-auto sm:w-96 reveal">
+          <div className="rounded-2xl bg-ink text-white p-4 shadow-2xl border border-amber/40 flex gap-3 items-start">
+            <span className="mt-1 size-3 rounded-full bg-amber shrink-0 pulse-ring" />
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-bold uppercase tracking-wider text-amber">Nueva cita</div>
+              <div className="font-display text-2xl font-extrabold uppercase leading-none mt-1">{toast.who}</div>
+              <div className="text-sm text-white/80 mt-1">{toast.what} · {toast.when}</div>
+              <Link href="/admin/agenda" onClick={() => setToast(null)} className="inline-block mt-2 text-sm font-bold text-amber underline">Ver en la agenda</Link>
+            </div>
+            <button onClick={() => setToast(null)} aria-label="Cerrar aviso" className="text-white/60 hover:text-white text-xl leading-none">×</button>
+          </div>
+        </div>
+      )}
       <aside className="hidden lg:flex flex-col w-64 shrink-0 bg-ink p-4 sticky top-0 h-screen">
         <Link href="/admin" className="px-2 py-3"><Logo /></Link>
         <div className="mt-4 flex-1 overflow-auto">{nav}</div>
