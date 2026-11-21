@@ -89,13 +89,32 @@ export interface Block {
   reason: string;
 }
 
+export type NotifEvent =
+  | "solicitud" | "confirmacion" | "recordatorio24" | "recordatorioHoy"
+  | "cancelacion" | "reprogramacion" | "pago" | "nuevaCita" | "nuevaPregunta";
+export type Audience = "Paciente" | "Erik";
+export type Channel = "Correo" | "WhatsApp";
+export interface ChannelPref { email: boolean; whatsapp: boolean }
+export interface NotifRule { patient?: ChannelPref; erik?: ChannelPref }
+export interface NotifSettings {
+  erikEmail: string;
+  erikWhatsapp: string;
+  rules: Record<NotifEvent, NotifRule>;
+}
+
 export interface Notice {
   id: string;
-  channel: "Correo" | "WhatsApp" | "Aviso interno";
+  channel: Channel | "Aviso interno";
   template: string;
   to: string;
+  subject?: string;
   body: string;
   at: string;
+  audience?: Audience;
+  event?: NotifEvent;
+  patientId?: string;
+  status?: "Simulado";
+  test?: boolean;
 }
 
 export interface AuditEntry {
@@ -133,4 +152,5 @@ export interface DB {
   media: MediaFile[];
   session: Session;
   exDone?: string[];
+  notif?: NotifSettings;
 }

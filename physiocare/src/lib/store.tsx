@@ -1,8 +1,9 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import type { Appointment, ApptStatus, Block, ContentItem, DB, MediaFile, Notice, Patient, PayStatus, Question, Service } from "./types";
+import type { Appointment, ApptStatus, Audience, Block, ContentItem, DB, MediaFile, Notice, NotifEvent, NotifSettings, Patient, PayStatus, Question, Service } from "./types";
 import { BRAND, makeSeed } from "./seed";
-import { fmtTime, longDate, todayStr, uid } from "./dates";
+import { addDays, fmtTime, longDate, todayStr, uid } from "./dates";
+import { DEFAULT_SETTINGS, EVENTS, plan, render, SAMPLE, type Vars } from "./notifications";
 
 const KEY = "efr-demo-v2"; // v2: contenido y categorías nuevas del bloque 2
 const SKEY = "efr-session-v1"; // la sesión es por pestaña (sessionStorage): paciente y Erik pueden estar abiertos a la vez
@@ -43,6 +44,10 @@ interface Ctx {
   updateQuestion: (id: string, patch: Partial<Question>) => void;
   likeQuestion: (id: string) => void;
   toggleExercise: (id: string) => void;
+  setNotifRule: (event: NotifEvent, audience: "patient" | "erik", channel: "email" | "whatsapp", value: boolean) => void;
+  setNotifContact: (patch: Partial<Pick<NotifSettings, "erikEmail" | "erikWhatsapp">>) => void;
+  sendReminders: (kind: "recordatorio24" | "recordatorioHoy") => number;
+  sendTest: (event: NotifEvent, audience: Audience) => void;
   audit: (action: string, target: string) => void;
   resetDemo: () => void;
 }
@@ -53,6 +58,24 @@ export function useStore() {
   const c = useContext(StoreCtx);
   if (!c) throw new Error("StoreProvider ausente");
   return c;
+}
+
+function apptVars(svcName: string, date: string, time: string, p: Patient): Vars {
+  return {
+    nombre: p.name.split(" ")[0],
+    paciente: p.name.replace(/\s*\((demo|ficticio|ficticia)\)/i, ""),
+    servicio: svcName,
+    fecha: longDate(date).toLowerCase(),
+    hora: fmtTime(time),
+  };
+}
+
+/** Punto unico de "envio". En la demo solo registra el mensaje como Simulado.
+ *  En produccion, aqui se llamaria al correo transaccional y a la API de WhatsApp Business. */
+function fire(d: DB, event: NotifEvent, v: Vars, patient?: Patient): DB {
+  const drafts = plan(d.notif ?? DEFAULT_SETTINGS, event, v, patient && { id: patient.id, email: patient.email, phone: patient.phone });
+  const at = new Date().toISOString();
+  return { ...d, notices: [...drafts.map((n) => ({ ...n, id: uid("n"), at })).reverse(), ...d.notices].slice(0, 200) };
 }
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -94,10 +117,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const mut = useCallback((fn: (d: DB) => DB) => setDb((d) => fn(d)), []);
 
-  const notice = (d: DB, n: Omit<Notice, "id" | "at">): DB => ({
-    ...d, notices: [{ ...n, id: uid("n"), at: new Date().toISOString() }, ...d.notices],
-  });
-
   const api = useMemo<Ctx>(() => ({
     db, ready,
     loginAs: (role, patientId) => mut((d) => ({ ...d, session: { role, patientId } })),
@@ -117,12 +136,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       mut((d) => {
         const p = d.patients.find((x) => x.id === i.patientId);
         const s = d.services.find((x) => x.id === i.serviceId);
-        const when = `${longDate(i.date)}, ${fmtTime(i.time)}`;
         let n = { ...d, appointments: [...d.appointments, a] };
         if (p && s) {
-          n = notice(n, { channel: "Correo", template: "Confirmación de cita", to: p.email, body: `Hola ${p.name.split(" ")[0]}, recibimos tu solicitud de ${s.name} para el ${when}. Erik la confirmará a la brevedad.` });
-          n = notice(n, { channel: "WhatsApp", template: "Confirmación de cita", to: p.phone, body: `${BRAND.name}: tu cita de ${s.name} quedó registrada para el ${when}. Responde 1 para confirmar o 2 para reprogramar.` });
-          n = notice(n, { channel: "Aviso interno", template: "Nueva cita", to: "Erik", body: `Nueva cita ${i.source === "manual" ? "(alta manual) " : ""}de ${p.name}: ${s.name}, ${when}.` });
+          const v = apptVars(s.name, i.date, i.time, p);
+          const origen = i.source === "manual" ? "alta manual" : i.source === "foro" ? "foro Pregúntale a Erik" : "sitio web";
+          n = fire(n, "solicitud", v, p);
+          n = fire(n, "nuevaCita", { ...v, origen }, p);
         }
         return n;
       });
@@ -132,8 +151,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       let n = { ...d, appointments: d.appointments.map((a) => (a.id === id ? { ...a, status } : a)) };
       const a = d.appointments.find((x) => x.id === id);
       const p = a && d.patients.find((x) => x.id === a.patientId);
-      if (a && p && status === "confirmada") {
-        n = notice(n, { channel: "WhatsApp", template: "Cita confirmada", to: p.phone, body: `Tu cita del ${longDate(a.date)} a las ${fmtTime(a.time)} fue confirmada. ¡Te esperamos!` });
+      if (a && p && status === "confirmada" && a.status !== "confirmada") {
+        const sv = d.services.find((x) => x.id === a.serviceId);
+        n = fire(n, "confirmacion", apptVars(sv?.name ?? "tu cita", a.date, a.time, p), p);
       }
       return n;
     }),
@@ -142,8 +162,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const p = a && d.patients.find((x) => x.id === a.patientId);
       let n = { ...d, appointments: d.appointments.map((x) => (x.id === id ? { ...x, status: "cancelada" as const } : x)) };
       if (a && p) {
-        n = notice(n, { channel: "Correo", template: "Cancelación", to: p.email, body: `Tu cita del ${longDate(a.date)} a las ${fmtTime(a.time)} fue cancelada por ${by}. Los reembolsos están sujetos a la política del consultorio.` });
-        n = notice(n, { channel: "Aviso interno", template: "Cancelación", to: "Erik", body: `${p.name} canceló (${by}): ${longDate(a.date)}, ${fmtTime(a.time)}.` });
+        const sv = d.services.find((x) => x.id === a.serviceId);
+        n = fire(n, "cancelacion", { ...apptVars(sv?.name ?? "tu cita", a.date, a.time, p), quien: by === "paciente" ? "el paciente" : "el consultorio" }, p);
       }
       return n;
     }),
@@ -151,7 +171,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const a = d.appointments.find((x) => x.id === id);
       const p = a && d.patients.find((x) => x.id === a.patientId);
       let n = { ...d, appointments: d.appointments.map((x) => (x.id === id ? { ...x, date, time, status: "pendiente" as const } : x)) };
-      if (a && p) n = notice(n, { channel: "WhatsApp", template: "Reprogramación", to: p.phone, body: `Tu cita se movió al ${longDate(date)} a las ${fmtTime(time)}.` });
+      if (a && p) {
+        const sv = d.services.find((x) => x.id === a.serviceId);
+        n = fire(n, "reprogramacion", apptVars(sv?.name ?? "tu cita", date, time, p), p);
+      }
       return n;
     }),
     payAppt: (apptId, kind, ok) => mut((d) => {
@@ -165,7 +188,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         appointments: d.appointments.map((x) => (x.id === apptId ? { ...x, pay: ok ? (kind === "anticipo" ? "anticipo" : "pagado") : "fallido" } : x)),
       };
       const p = d.patients.find((x) => x.id === a.patientId);
-      if (ok && p) n = notice(n, { channel: "Correo", template: "Confirmación de pago", to: p.email, body: `Recibimos tu ${pay.concept.toLowerCase()} de ${amount} MXN (pago simulado de demostración).` });
+      if (ok && p) n = fire(n, "pago", { ...apptVars(s.name, a.date, a.time, p), monto: `$${amount}`, concepto: pay.concept.toLowerCase() }, p);
       return n;
     }),
     refund: (apptId) => mut((d) => {
@@ -186,11 +209,39 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     removeMedia: (id) => mut((d) => ({ ...d, media: d.media.filter((m) => m.id !== id) })),
     submitQuestion: (q) => mut((d) => {
       const nq: Question = { ...q, id: uid("q"), status: "pendiente", me2: 0, createdAt: new Date().toISOString() };
-      return notice({ ...d, questions: [nq, ...d.questions] }, { channel: "Aviso interno", template: "Nueva pregunta", to: "Erik", body: `Pregunta pendiente de moderación: «${q.title}»` });
+      return fire({ ...d, questions: [nq, ...d.questions] }, "nuevaPregunta", { pregunta: q.title });
     }),
     updateQuestion: (id, patch) => mut((d) => ({ ...d, questions: d.questions.map((q) => (q.id === id ? { ...q, ...patch } : q)) })),
     likeQuestion: (id) => mut((d) => ({ ...d, questions: d.questions.map((q) => (q.id === id ? { ...q, me2: q.me2 + 1 } : q)) })),
     toggleExercise: (id) => mut((d) => { const cur = d.exDone ?? []; return { ...d, exDone: cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id] }; }),
+    setNotifRule: (event, audience, channel, value) => mut((d) => {
+      const cur = d.notif ?? DEFAULT_SETTINGS;
+      const rule = cur.rules[event];
+      const pref = { ...(rule[audience] ?? { email: false, whatsapp: false }), [channel]: value };
+      return { ...d, notif: { ...cur, rules: { ...cur.rules, [event]: { ...rule, [audience]: pref } } } };
+    }),
+    setNotifContact: (patch) => mut((d) => ({ ...d, notif: { ...(d.notif ?? DEFAULT_SETTINGS), ...patch } })),
+    sendReminders: (kind) => {
+      const target = kind === "recordatorio24" ? addDays(todayStr(), 1) : todayStr();
+      const list = db.appointments.filter((a) => a.date === target && (a.status === "confirmada" || a.status === "pendiente"));
+      if (list.length) mut((d) => list.reduce((acc, a) => {
+        const p = acc.patients.find((x) => x.id === a.patientId);
+        const sv = acc.services.find((x) => x.id === a.serviceId);
+        return p && sv ? fire(acc, kind, apptVars(sv.name, a.date, a.time, p), p) : acc;
+      }, d));
+      return list.length;
+    },
+    sendTest: (event, audience) => mut((d) => {
+      const cfg = d.notif ?? DEFAULT_SETTINGS;
+      const label = EVENTS.find((e) => e.id === event)!.label;
+      const at = new Date().toISOString();
+      const mk = (channel: "Correo" | "WhatsApp", to: string): Omit<Notice, "id" | "at"> | null => {
+        const r = render(event, audience, channel, SAMPLE);
+        return r ? { channel, template: `Prueba · ${label}`, to, subject: r.subject, body: r.body, audience: "Erik", event, status: "Simulado", test: true } : null;
+      };
+      const items = [mk("Correo", cfg.erikEmail), mk("WhatsApp", cfg.erikWhatsapp)].filter((x): x is Omit<Notice, "id" | "at"> => !!x);
+      return { ...d, notices: [...items.map((n) => ({ ...n, id: uid("n"), at })), ...d.notices].slice(0, 200) };
+    }),
     audit: (action, target) => mut((d) => ({ ...d, audit: [{ id: uid("au"), at: new Date().toISOString(), actor: "Erik (admin demo)", action, target }, ...d.audit].slice(0, 100) })),
     resetDemo: () => { skipSave.current = false; setDb((cur) => ({ ...makeSeed(todayStr()), session: cur.session })); },
   }), [db, ready, mut]);
