@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import type { ApptStatus, PayStatus } from "@/lib/types";
+import { useDemoUI } from "./DemoUI";
 
 export type Flag = "demo" | "pendiente" | "config" | "proxima";
 const FLAGS: Record<Flag, { t: string; c: string }> = {
@@ -10,7 +11,9 @@ const FLAGS: Record<Flag, { t: string; c: string }> = {
   config: { t: "Requiere configuración", c: "bg-sky-100 text-sky-800" },
   proxima: { t: "Próxima implementación", c: "bg-violet-100 text-violet-800" },
 };
-export function FlagBadge({ flag, dark }: { flag: Flag; dark?: boolean }) {
+export function FlagBadge({ flag, dark, always }: { flag: Flag; dark?: boolean; always?: boolean }) {
+  const { show } = useDemoUI();
+  if (!show && !always) return null;
   const f = FLAGS[flag];
   return (
     <span className={`chip ${dark ? "bg-white/10 text-white" : f.c}`}>
