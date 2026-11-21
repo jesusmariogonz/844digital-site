@@ -5,15 +5,16 @@ import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { Empty, FlagBadge, Modal, PayChip, StatusChip } from "@/components/ui";
 import { SlotPicker } from "@/components/SlotPicker";
-import { recordFor } from "@/lib/seed";
+import { recordFor, EXERCISES, PLAN_SESSIONS } from "@/lib/seed";
+import { Evolution } from "@/components/Evolution";
 import { fmtTime, longDate, money, shortDate, todayStr } from "@/lib/dates";
 
-const TABS = ["Resumen", "Mis citas", "Pagos", "Documentos", "Perfil", "Expediente"] as const;
+const TABS = ["Mi recuperación", "Mis citas", "Pagos", "Documentos", "Perfil", "Expediente"] as const;
 
 export default function Cuenta() {
   const router = useRouter();
-  const { db, ready, logout, cancelAppt, reschedule, updatePatient, payAppt, setApptStatus } = useStore();
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Resumen");
+  const { db, ready, logout, cancelAppt, reschedule, updatePatient, payAppt, setApptStatus, toggleExercise } = useStore();
+  const [tab, setTab] = useState<(typeof TABS)[number]>("Mi recuperación");
   const [resched, setResched] = useState<string | null>(null);
   const [slot, setSlot] = useState<{ date: string; time: string } | null>(null);
   const [saved, setSaved] = useState(false);
@@ -37,6 +38,11 @@ export default function Cuenta() {
   const svc = (id: string) => db.services.find((s) => s.id === id)!;
   const rec = recordFor(p.id, today);
   const rAppt = db.appointments.find((a) => a.id === resched);
+  const exDone = db.exDone ?? [];
+  const pendingEx = EXERCISES.filter((e) => !exDone.includes(e.id)).length;
+  const doneSessions = mine.filter((a) => a.status === "completada").length;
+  const progress = Math.min(100, Math.round((doneSessions / PLAN_SESSIONS) * 100));
+  const paid = pays.filter((x) => x.status === "aprobado").reduce((s2, x) => s2 + x.amount, 0);
 
   const ApptRow = ({ a, actions }: { a: (typeof mine)[number]; actions?: boolean }) => (
     <div className="card p-4 flex flex-wrap items-center gap-4 justify-between">
@@ -59,7 +65,7 @@ export default function Cuenta() {
     <div className="container-x pt-12">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="eyebrow">Portal del paciente</div>
+          <div className="eyebrow">Mi recuperación</div>
           <h1 className="section-title mt-1">Hola, {p.name.split(" ")[0]}</h1>
         </div>
         <div className="flex gap-2"><Link href="/agendar" className="btn btn-primary">Nueva cita</Link><button className="btn btn-outline" onClick={() => { logout(); router.push("/"); }}>Cerrar sesión</button></div>
@@ -69,15 +75,53 @@ export default function Cuenta() {
       </div>
 
       <div className="mt-6 space-y-4">
-        {tab === "Resumen" && (
+        {tab === "Mi recuperación" && (
           <>
-            <div className="grid sm:grid-cols-3 gap-4">
-              <div className="card p-5 !bg-ink text-white"><div className="text-xs font-bold uppercase text-amber">Próxima cita</div>{upcoming[0] ? <><div className="font-display text-3xl font-extrabold uppercase mt-2 leading-none">{svc(upcoming[0].serviceId).name}</div><div className="mt-2 text-white/80">{shortDate(upcoming[0].date)} · {fmtTime(upcoming[0].time)}</div></> : <div className="mt-2 text-white/70">Sin citas próximas</div>}</div>
-              <div className="card p-5"><div className="text-xs font-bold uppercase text-slate-500">Sesiones completadas</div><div className="font-display text-5xl font-extrabold mt-2">{mine.filter((a) => a.status === "completada").length}</div></div>
-              <div className="card p-5"><div className="text-xs font-bold uppercase text-slate-500">Pagos registrados</div><div className="font-display text-5xl font-extrabold mt-2">{pays.filter((x) => x.status === "aprobado").length}</div></div>
+            <div className="grid lg:grid-cols-3 gap-4">
+              <section className="card !bg-ink text-white p-6 lg:col-span-2 relative overflow-hidden">
+                <div className="text-xs font-bold uppercase tracking-wider text-amber">Próxima cita</div>
+                {upcoming[0] ? (
+                  <>
+                    <div className="font-display text-5xl sm:text-6xl font-extrabold uppercase leading-none mt-3">{shortDate(upcoming[0].date)} · {fmtTime(upcoming[0].time)}</div>
+                    <div className="mt-2 text-white/80 text-lg">{svc(upcoming[0].serviceId).name}</div>
+                    <div className="mt-4 flex gap-2 flex-wrap"><StatusChip s={upcoming[0].status} /><PayChip s={upcoming[0].pay} /></div>
+                    <div className="mt-5 flex gap-2 flex-wrap"><button className="btn btn-primary btn-sm" onClick={() => { setResched(upcoming[0].id); setSlot(null); }}>Reprogramar</button><button className="btn btn-ghost btn-sm" onClick={() => setTab("Mis citas")}>Ver todas mis citas</button></div>
+                  </>
+                ) : (<><div className="font-display text-4xl font-extrabold uppercase mt-3">Sin citas próximas</div><Link href="/agendar?servicio=s_eval" className="btn btn-primary mt-4">Agendar valoración</Link></>)}
+              </section>
+              <section className="card p-6">
+                <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Tu progreso</div>
+                <div className="font-display text-6xl font-extrabold leading-none mt-2">{progress}%</div>
+                <div className="h-3 rounded-full bg-mist mt-3 overflow-hidden"><div className="h-full rounded-full bg-brand transition-all duration-1000" style={{ width: `${progress}%` }} /></div>
+                <p className="text-sm text-slate-500 mt-2">{doneSessions} de {PLAN_SESSIONS} sesiones del plan (ejemplo)</p>
+              </section>
             </div>
+
+            <div className="grid lg:grid-cols-3 gap-4">
+              <section className="card p-6 lg:col-span-2">
+                <div className="flex items-center justify-between gap-2"><h2 className="font-display text-3xl font-extrabold uppercase">Ejercicios</h2><span className="chip bg-amber/20 text-ink">{pendingEx} pendiente{pendingEx === 1 ? "" : "s"}</span></div>
+                <ul className="mt-3 divide-y divide-mist">
+                  {EXERCISES.map((e) => { const on = exDone.includes(e.id); return (
+                    <li key={e.id}><button onClick={() => toggleExercise(e.id)} aria-pressed={on} className="w-full flex items-center gap-3 py-3 text-left">
+                      <span className={`size-7 rounded-full grid place-items-center border-2 font-bold ${on ? "bg-emerald-500 border-emerald-500 text-white" : "border-slate-300"}`}>{on ? "✓" : ""}</span>
+                      <span className="flex-1"><b className={on ? "line-through text-slate-400" : ""}>{e.name}</b><span className="block text-sm text-slate-500">{e.detail}</span></span>
+                    </button></li>); })}
+                </ul>
+                <p className="text-xs text-slate-500 mt-2">Plan de ejemplo con datos ficticios.</p>
+              </section>
+              <div className="grid gap-4 content-start">
+                <button onClick={() => setTab("Pagos")} className="card p-5 text-left hover-lift"><div className="text-xs font-bold uppercase text-slate-500">Pagos</div><div className="font-display text-4xl font-extrabold mt-1">{money(paid)}</div><div className="text-sm text-slate-500">pagado en total</div></button>
+                <button onClick={() => setTab("Documentos")} className="card p-5 text-left hover-lift"><div className="text-xs font-bold uppercase text-slate-500">Documentos</div><div className="font-display text-4xl font-extrabold mt-1">{rec.archivos.length}</div><div className="text-sm text-slate-500">disponible{rec.archivos.length === 1 ? "" : "s"}</div></button>
+              </div>
+            </div>
+
+            <section className="card p-6">
+              <div className="flex items-center gap-2 flex-wrap"><h2 className="font-display text-3xl font-extrabold uppercase">Tu evolución</h2><span className="chip bg-slate-100 text-slate-600">Datos ficticios</span></div>
+              <div className="mt-4 max-w-2xl"><Evolution sesiones={rec.sesiones} /></div>
+            </section>
+
             <h2 className="font-display text-3xl font-extrabold uppercase pt-2">Próximas citas</h2>
-            {upcoming.length ? upcoming.map((a) => <ApptRow key={a.id} a={a} actions />) : <Empty>No tienes citas próximas. <Link href="/agendar" className="text-brand font-bold">Agenda una</Link>.</Empty>}
+            {upcoming.length ? upcoming.map((a) => <ApptRow key={a.id} a={a} actions />) : <Empty>No tienes citas próximas.</Empty>}
           </>
         )}
         {tab === "Mis citas" && (

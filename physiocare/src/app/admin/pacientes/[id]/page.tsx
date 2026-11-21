@@ -5,6 +5,7 @@ import { useStore } from "@/lib/store";
 import { BackLink, FlagBadge, PageHead, PayChip, StatusChip, Empty } from "@/components/ui";
 import { recordFor } from "@/lib/seed";
 import { fmtTime, shortDate, todayStr } from "@/lib/dates";
+import { Evolution } from "@/components/Evolution";
 
 const ROLES: [string, string, string, string][] = [
   ["Fisioterapeuta (Erik)", "Ver y editar", "Ver y editar", "Ver y editar"],
@@ -24,6 +25,8 @@ export default function PacienteDetalle() {
   if (!p) return <Empty>Paciente no encontrado. <BackLink href="/admin/pacientes">Volver</BackLink></Empty>;
   const ap = db.appointments.filter((a) => a.patientId === p.id).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
   const rec = recordFor(p.id, todayStr());
+  const today = todayStr();
+  const nextAppt = ap.filter((a) => a.date >= today && (a.status === "pendiente" || a.status === "confirmada")).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))[0];
   const logs = db.audit.filter((l) => l.target === p.name).slice(0, 6);
 
   return (
@@ -57,6 +60,22 @@ export default function PacienteDetalle() {
             <b>Expediente ficticio de demostración.</b> No contiene ni debe contener información clínica real. Antes de manejar expedientes reales se requiere autenticación robusta, cifrado, auditoría, consentimiento y validación de cumplimiento (LFPDPPP y NOM-004-SSA3-2012).
             <div className="mt-2"><FlagBadge flag="proxima" /></div>
           </div>
+          <section className="card-dark p-6 grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2">
+              <div className="text-xs font-bold uppercase tracking-wider text-amber">Expediente</div>
+              <h2 className="font-display text-5xl font-extrabold uppercase leading-none mt-1">{p.name.split(" (")[0]}</h2>
+              <p className="text-white/70 mt-2">Paciente desde {p.createdAt.slice(0, 4)} · {ap.filter((a) => a.status === "completada").length} sesiones completadas</p>
+              <p className="text-white/80 mt-3"><b className="text-white">Motivo:</b> {rec.motivo}</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-5">
+              <div className="text-xs font-bold uppercase tracking-wider text-amber">Próxima cita</div>
+              {nextAppt ? (<><div className="font-display text-4xl font-extrabold uppercase leading-none mt-2">{shortDate(nextAppt.date)}</div><div className="text-white/80 mt-1">{fmtTime(nextAppt.time)} · {db.services.find((x) => x.id === nextAppt.serviceId)?.name}</div></>) : <div className="mt-2 text-white/70">Sin cita programada</div>}
+            </div>
+          </section>
+          <section className="card p-6">
+            <div className="flex items-center gap-2 flex-wrap mb-4"><h3 className="font-display text-3xl font-extrabold uppercase">Evolución</h3><span className="chip bg-slate-100 text-slate-600">Datos ficticios</span></div>
+            <div className="max-w-3xl"><Evolution sesiones={rec.sesiones} /></div>
+          </section>
           <div className="grid lg:grid-cols-2 gap-5">
             {([["Antecedentes", rec.antecedentes], ["Motivo de consulta", rec.motivo], ["Evaluación inicial", rec.evaluacion], ["Valoración profesional", rec.valoracion], ["Plan de tratamiento", rec.plan]] as [string, string][]).map(([t, v]) => (
               <section key={t} className="card p-5"><h3 className="font-display text-2xl font-extrabold uppercase">{t}</h3><p className="text-slate-700 mt-1">{v}</p></section>
@@ -64,9 +83,9 @@ export default function PacienteDetalle() {
             <section className="card p-5"><h3 className="font-display text-2xl font-extrabold uppercase">Archivos adjuntos</h3>{rec.archivos.length ? <ul className="mt-2 space-y-1 text-sm">{rec.archivos.map((f) => <li key={f}>📎 {f}</li>)}</ul> : <p className="text-slate-500 text-sm mt-1">Sin archivos.</p>}</section>
           </div>
           <section className="card p-5">
-            <h3 className="font-display text-2xl font-extrabold uppercase mb-3">Evolución de sesiones</h3>
+            <h3 className="font-display text-2xl font-extrabold uppercase mb-3">Historial de sesiones</h3>
             <ol className="relative border-l-2 border-brand/30 ml-2 space-y-4">
-              {rec.sesiones.map((s) => <li key={s.fecha} className="pl-5 relative"><i className="absolute -left-[7px] top-1.5 size-3 rounded-full bg-brand" /><div className="text-xs font-bold text-brand">{shortDate(s.fecha)}</div><div>{s.nota}</div><div className="text-sm text-slate-500">{s.evolucion}</div></li>)}
+              {rec.sesiones.map((s) => <li key={s.fecha} className="pl-5 relative"><i className="absolute -left-[7px] top-1.5 size-3 rounded-full bg-brand" /><div className="text-xs font-bold text-brand">{shortDate(s.fecha)}</div><div className="font-semibold">{s.nota}</div><div className="text-sm text-slate-500">{s.evolucion}</div><div className="mt-1 flex gap-1.5 flex-wrap"><span className="chip bg-red-50 text-red-700">Dolor {s.dolor}/10</span><span className="chip bg-blue-50 text-blue-700">Movilidad {s.movilidad}%</span><span className="chip bg-emerald-50 text-emerald-700">Fuerza {s.fuerza}%</span></div></li>)}
             </ol>
           </section>
           <div className="grid lg:grid-cols-2 gap-5">

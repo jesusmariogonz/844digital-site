@@ -24,7 +24,7 @@ export default function Contacto() {
             <a href={wa} target="_blank" rel="noopener noreferrer" className="btn btn-blue">WhatsApp</a>
             <a href={BRAND.instagram} target="_blank" rel="noopener noreferrer" className="btn btn-outline">Instagram</a>
             <a href={`tel:${BRAND.phone.replace(/\s/g, "")}`} className="btn btn-outline">Llamar {BRAND.phone}</a>
-            <Link href="/agendar" className="btn btn-primary">Agendar cita</Link>
+            <Link href="/agendar?servicio=s_eval" className="btn btn-primary">Agendar valoración</Link>
           </div>
           <div className="card overflow-hidden">
             <iframe title="Mapa de Saltillo, Coahuila" loading="lazy" className="w-full h-72 border-0" src="https://www.google.com/maps?q=Saltillo,+Coahuila&output=embed" referrerPolicy="no-referrer-when-downgrade" />

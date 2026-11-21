@@ -11,7 +11,33 @@ export const BRAND = {
   whatsapp: "528440000000", // DEMO: reemplazar por el número real
   phone: "844 000 0000", // DEMO
   email: "contacto@ejemplo.com", // DEMO
-  address: "Saltillo, Coahuila (dirección por confirmar)",
+  address: "Saltillo, Coahuila",
+};
+
+/** Perfil público de Erik. Cualquier campo vacío NO se muestra en el sitio.
+ *  No se inventan cifras ni credenciales: Erik las captura cuando quiera mostrarlas. */
+export const PROFILE = {
+  name: "Erik Esqueda",
+  role: "Fisioterapeuta · Entrenamiento · Rendimiento",
+  pitch: "Ayudo a personas activas y deportistas a recuperar movimiento, fuerza y confianza para volver a hacer lo que les gusta.",
+  location: "Saltillo, Coahuila",
+  followers: "16 mil+", // visto en su perfil público de Instagram
+  years: "", // ej. "8"
+  patients: "", // ej. "1,500"
+  specialty: "Lesiones deportivas y dolor",
+  education: [] as string[],
+  certifications: [] as string[],
+  experience: [] as string[],
+  philosophy: "",
+  // Reseñas de EJEMPLO para la demo. Al tener reseñas reales y autorizadas: sustituir la lista,
+  // poner reviewsAreDemo en false y capturar la calificación real.
+  reviewsAreDemo: true,
+  reviewsRating: "4.9",
+  reviews: [
+    { name: "Paciente de ejemplo", detail: "Corredor recreativo", text: "Llegué con dolor en la rodilla y salí con un plan claro. Me explicó todo sin tecnicismos y me fue guiando paso a paso.", stars: 5 },
+    { name: "Paciente de ejemplo", detail: "Entrenamiento de fuerza", text: "Muy buena atención. Se nota que sabe de rendimiento: me ayudó a volver al gimnasio con confianza y sin prisas.", stars: 5 },
+    { name: "Paciente de ejemplo", detail: "Trabajo de oficina", text: "Agendar fue facilísimo desde el celular y los recordatorios por WhatsApp me ayudaron mucho. Excelente trato.", stars: 5 },
+  ] as { name: string; detail: string; text: string; stars: number }[],
 };
 
 export const SERVICES: Service[] = [
@@ -69,6 +95,7 @@ export function makeSeed(today: string): DB {
   };
   const t = (n: number, time: string) => (dow(addDays(today, n)) === 6 && time >= "13:00" ? "11:00" : time);
   const iso = new Date().toISOString();
+  const past = new Date(Date.now() - 3 * 86_400_000).toISOString(); // las citas de ejemplo no son "nuevas"
   return {
     services: SERVICES,
     patients: [
@@ -80,20 +107,20 @@ export function makeSeed(today: string): DB {
       { id: "p_marco", name: "Marco Villarreal (ficticio)", email: "marco@ejemplo.demo", phone: "844 555 0106", birth: "1984-03-08", notes: "Postoperatorio de rodilla.", demo: true, createdAt: iso },
     ],
     appointments: [
-      { id: "a1", patientId: "p_luis", serviceId: "s_dep", date: d(0), time: t(0, "10:00"), status: "confirmada", pay: "pagado", source: "web", reason: "Dolor en rodilla al correr", createdAt: iso },
-      { id: "a2", patientId: "p_carla", serviceId: "s_manual", date: d(0), time: t(0, "12:00"), status: "pendiente", pay: "anticipo", source: "web", createdAt: iso },
-      { id: "a3", patientId: "p_diego", serviceId: "s_lesion", date: d(0), time: t(0, "16:00"), status: "confirmada", pay: "sin_pago", source: "manual", createdAt: iso },
-      { id: "a4", patientId: "p_ana", serviceId: "s_rehab", date: d(2), time: t(2, "17:00"), status: "confirmada", pay: "anticipo", source: "web", reason: "Seguimiento de hombro", createdAt: iso },
-      { id: "a5", patientId: "p_marco", serviceId: "s_post", date: d(1), time: t(1, "09:00"), status: "confirmada", pay: "pagado", source: "web", createdAt: iso },
-      { id: "a6", patientId: "p_sofia", serviceId: "s_dolor", date: d(3), time: t(3, "11:00"), status: "pendiente", pay: "sin_pago", source: "foro", reason: "Dolor lumbar", createdAt: iso },
-      { id: "a7", patientId: "p_luis", serviceId: "s_dep", date: d(5), time: t(5, "10:00"), status: "confirmada", pay: "anticipo", source: "web", createdAt: iso },
-      { id: "a8", patientId: "p_ana", serviceId: "s_eval", date: d(-9), time: t(-9, "17:00"), status: "completada", pay: "pagado", source: "web", createdAt: iso },
-      { id: "a9", patientId: "p_ana", serviceId: "s_rehab", date: d(-4), time: t(-4, "17:00"), status: "completada", pay: "pagado", source: "web", createdAt: iso },
-      { id: "a10", patientId: "p_carla", serviceId: "s_eval", date: d(-12), time: t(-12, "10:00"), status: "completada", pay: "pagado", source: "web", createdAt: iso },
-      { id: "a11", patientId: "p_diego", serviceId: "s_dep", date: d(-6), time: t(-6, "16:00"), status: "cancelada", pay: "reembolsado", source: "web", createdAt: iso },
-      { id: "a12", patientId: "p_marco", serviceId: "s_post", date: d(-3), time: t(-3, "09:00"), status: "completada", pay: "pagado", source: "web", createdAt: iso },
-      { id: "a13", patientId: "p_sofia", serviceId: "s_eval", date: d(-20), time: t(-20, "12:00"), status: "completada", pay: "pagado", source: "web", createdAt: iso },
-      { id: "a14", patientId: "p_luis", serviceId: "s_lesion", date: d(-15), time: t(-15, "10:00"), status: "completada", pay: "pagado", source: "manual", createdAt: iso },
+      { id: "a1", patientId: "p_luis", serviceId: "s_dep", date: d(0), time: t(0, "10:00"), status: "confirmada", pay: "pagado", source: "web", reason: "Dolor en rodilla al correr", createdAt: past },
+      { id: "a2", patientId: "p_carla", serviceId: "s_manual", date: d(0), time: t(0, "12:00"), status: "pendiente", pay: "anticipo", source: "web", createdAt: past },
+      { id: "a3", patientId: "p_diego", serviceId: "s_lesion", date: d(0), time: t(0, "16:00"), status: "confirmada", pay: "sin_pago", source: "manual", createdAt: past },
+      { id: "a4", patientId: "p_ana", serviceId: "s_rehab", date: d(2), time: t(2, "17:00"), status: "confirmada", pay: "anticipo", source: "web", reason: "Seguimiento de hombro", createdAt: past },
+      { id: "a5", patientId: "p_marco", serviceId: "s_post", date: d(1), time: t(1, "09:00"), status: "confirmada", pay: "pagado", source: "web", createdAt: past },
+      { id: "a6", patientId: "p_sofia", serviceId: "s_dolor", date: d(3), time: t(3, "11:00"), status: "pendiente", pay: "sin_pago", source: "foro", reason: "Dolor lumbar", createdAt: past },
+      { id: "a7", patientId: "p_luis", serviceId: "s_dep", date: d(5), time: t(5, "10:00"), status: "confirmada", pay: "anticipo", source: "web", createdAt: past },
+      { id: "a8", patientId: "p_ana", serviceId: "s_eval", date: d(-9), time: t(-9, "17:00"), status: "completada", pay: "pagado", source: "web", createdAt: past },
+      { id: "a9", patientId: "p_ana", serviceId: "s_rehab", date: d(-4), time: t(-4, "17:00"), status: "completada", pay: "pagado", source: "web", createdAt: past },
+      { id: "a10", patientId: "p_carla", serviceId: "s_eval", date: d(-12), time: t(-12, "10:00"), status: "completada", pay: "pagado", source: "web", createdAt: past },
+      { id: "a11", patientId: "p_diego", serviceId: "s_dep", date: d(-6), time: t(-6, "16:00"), status: "cancelada", pay: "reembolsado", source: "web", createdAt: past },
+      { id: "a12", patientId: "p_marco", serviceId: "s_post", date: d(-3), time: t(-3, "09:00"), status: "completada", pay: "pagado", source: "web", createdAt: past },
+      { id: "a13", patientId: "p_sofia", serviceId: "s_eval", date: d(-20), time: t(-20, "12:00"), status: "completada", pay: "pagado", source: "web", createdAt: past },
+      { id: "a14", patientId: "p_luis", serviceId: "s_lesion", date: d(-15), time: t(-15, "10:00"), status: "completada", pay: "pagado", source: "manual", createdAt: past },
     ],
     payments: [
       { id: "pay1", apptId: "a1", patientId: "p_luis", amount: 700, concept: "Consulta", status: "aprobado", method: "Pasarela de demostración", date: d(-1) },
@@ -143,7 +170,7 @@ export interface ClinicalRecord {
   evaluacion: string;
   valoracion: string;
   plan: string;
-  sesiones: { fecha: string; nota: string; evolucion: string }[];
+  sesiones: { fecha: string; nota: string; evolucion: string; dolor: number; movilidad: number; fuerza: number }[];
   archivos: string[];
 }
 
@@ -157,8 +184,10 @@ export function recordFor(patientId: string, today: string): ClinicalRecord {
       valoracion: "Valoración funcional compatible con sobrecarga de hombro relacionada con el entrenamiento (texto ficticio de ejemplo).",
       plan: "Fase 1: control de carga y movilidad. Fase 2: fortalecimiento progresivo. Fase 3: retorno gradual a movimientos sobre la cabeza. Revisión cada 2 semanas.",
       sesiones: [
-        { fecha: d(-9), nota: "Evaluación inicial y educación sobre carga.", evolucion: "Dolor 6/10 → 5/10" },
-        { fecha: d(-4), nota: "Ejercicios de control escapular y rotadores.", evolucion: "Dolor 4/10, mejora de movilidad" },
+        { fecha: d(-23), nota: "Evaluación inicial y educación sobre carga.", evolucion: "Línea base", dolor: 7, movilidad: 55, fuerza: 50 },
+        { fecha: d(-16), nota: "Control escapular y movilidad.", evolucion: "Mejora de rango sin dolor", dolor: 6, movilidad: 65, fuerza: 55 },
+        { fecha: d(-9), nota: "Fortalecimiento de rotadores.", evolucion: "Menos molestia al elevar el brazo", dolor: 4, movilidad: 78, fuerza: 66 },
+        { fecha: d(-4), nota: "Progresión de carga y patrón de empuje.", evolucion: "Buena tolerancia al ejercicio", dolor: 3, movilidad: 88, fuerza: 78 },
       ],
       archivos: ["Consentimiento_informado_DEMO.pdf", "Ejercicios_en_casa_fase1_DEMO.pdf"],
     },
@@ -168,7 +197,7 @@ export function recordFor(patientId: string, today: string): ClinicalRecord {
       evaluacion: "Dolor reproducible con flexión repetida de rodilla. Debilidad de glúteo medio en prueba funcional.",
       valoracion: "Hallazgos compatibles con dolor lateral de rodilla asociado a carga de entrenamiento (texto ficticio).",
       plan: "Ajuste de volumen de carrera, fortalecimiento de cadera y retorno progresivo por kilometraje.",
-      sesiones: [{ fecha: d(-15), nota: "Valoración y plan.", evolucion: "Dolor 5/10" }],
+      sesiones: [{ fecha: d(-22), nota: "Valoración y plan.", evolucion: "Línea base", dolor: 6, movilidad: 60, fuerza: 55 }, { fecha: d(-15), nota: "Ajuste de carga de carrera.", evolucion: "Menos dolor al correr", dolor: 4, movilidad: 72, fuerza: 64 }],
       archivos: ["Plan_retorno_correr_DEMO.pdf"],
     },
   };
@@ -179,8 +208,16 @@ export function recordFor(patientId: string, today: string): ClinicalRecord {
       evaluacion: "Evaluación inicial de ejemplo.",
       valoracion: "Valoración profesional de ejemplo (ficticia).",
       plan: "Plan de tratamiento de ejemplo.",
-      sesiones: [{ fecha: d(-7), nota: "Sesión de ejemplo.", evolucion: "Evolución favorable (ejemplo)" }],
+      sesiones: [{ fecha: d(-14), nota: "Sesión de ejemplo.", evolucion: "Línea base (ejemplo)", dolor: 6, movilidad: 60, fuerza: 55 }, { fecha: d(-7), nota: "Sesión de ejemplo.", evolucion: "Evolución favorable (ejemplo)", dolor: 4, movilidad: 72, fuerza: 66 }],
       archivos: [],
     }
   );
 }
+
+/** Ejercicios del plan de "Mi recuperación" (ficticios en la demo). */
+export const EXERCISES = [
+  { id: "e1", name: "Rotación externa con banda", detail: "3 series × 12 repeticiones" },
+  { id: "e2", name: "Control escapular en pared", detail: "3 series × 10 repeticiones" },
+  { id: "e3", name: "Movilidad de hombro con bastón", detail: "2 series × 8 repeticiones" },
+];
+export const PLAN_SESSIONS = 8; // sesiones previstas del plan (ficticio)

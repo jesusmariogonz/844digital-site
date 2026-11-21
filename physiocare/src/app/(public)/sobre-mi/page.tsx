@@ -1,47 +1,62 @@
 import Link from "next/link";
 import { IMG } from "@/lib/images";
 import { Img } from "@/components/ui";
-import { SectionHead } from "@/components/cards";
+import { PROFILE } from "@/lib/seed";
 
 export const metadata = { title: "Sobre mí" };
 
-const FIELDS: [string, string][] = [
-  ["Formación académica", "Campo editable: Erik capturará aquí su formación."],
-  ["Certificaciones", "Campo editable: cursos y certificaciones verificables."],
-  ["Especialidades", "Lesiones deportivas y dolor · Rehabilitación y rendimiento (según su perfil público)."],
-  ["Experiencia", "Campo editable: trayectoria profesional."],
+const LISTS: [string, string[]][] = [
+  ["Formación académica", PROFILE.education],
+  ["Certificaciones", PROFILE.certifications],
+  ["Experiencia", PROFILE.experience],
 ];
 
 export default function SobreMi() {
+  const stats = [
+    [PROFILE.years && `+${PROFILE.years}`, "años de experiencia"],
+    [PROFILE.patients && `+${PROFILE.patients}`, "pacientes atendidos"],
+    [PROFILE.specialty, "especialidad"],
+    [PROFILE.location, "consultorio"],
+  ].filter(([v]) => v);
+  const lists = LISTS.filter(([, items]) => items.length > 0);
+
   return (
     <div className="container-x pt-14">
       <div className="grid md:grid-cols-5 gap-10 items-start">
         <div className="md:col-span-2 md:sticky md:top-24">
-          <div className="rounded-3xl overflow-hidden aspect-[4/5] relative">
-            <Img src={IMG.heroAlt} alt="Fotografía de stock; se reemplaza por la de Erik" />
-            <span className="absolute bottom-3 left-3 chip bg-ink/80 text-white">Foto de stock</span>
-          </div>
+          <div className="rounded-3xl overflow-hidden aspect-[4/5]"><Img src={IMG.heroAlt} alt={PROFILE.name} /></div>
         </div>
         <div className="md:col-span-3">
-          <SectionHead h1 eyebrow="Sobre mí" title="Erik Esqueda">Fisioterapeuta y entrenador personal en Saltillo, Coahuila.</SectionHead>
-          <div className="card p-6">
-            <h3 className="font-display text-2xl font-extrabold uppercase">Biografía</h3>
-            <p className="mt-2 text-slate-600">Erik se enfoca en lesiones deportivas y dolor, y en rehabilitación combinada con rendimiento. Comparte contenido educativo en Instagram para que las personas entiendan su cuerpo y su dolor. <i>La biografía completa es un campo editable que Erik redactará.</i></p>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4 mt-4">
-            {FIELDS.map(([t, d]) => (
-              <div key={t} className="card p-5">
-                <h3 className="font-display text-xl font-extrabold uppercase">{t}</h3>
-                <p className="text-sm text-slate-600 mt-1">{d}</p>
-                <span className="chip bg-sky-100 text-sky-800 mt-3">Requiere configuración</span>
-              </div>
+          <div className="eyebrow">Sobre mí</div>
+          <h1 className="section-title mt-2">{PROFILE.name}</h1>
+          <p className="mt-2 font-display text-2xl font-bold uppercase text-brand">{PROFILE.role}</p>
+          <p className="mt-5 text-xl text-slate-700">{PROFILE.pitch}</p>
+
+          <dl className="mt-8 grid grid-cols-2 gap-4">
+            {stats.map(([v, l]) => (
+              <div key={l as string} className="card p-5"><dt className="font-display text-3xl font-extrabold leading-none">{v}</dt><dd className="text-sm text-slate-500 mt-1">{l}</dd></div>
             ))}
-          </div>
-          <div className="card-dark p-6 mt-4">
-            <h3 className="font-display text-2xl font-extrabold uppercase text-amber">Filosofía de atención</h3>
-            <p className="mt-2 text-white/80">Explicar con claridad, mover con propósito y acompañar cada etapa. Sin promesas milagrosas: tu proceso importa. <i className="text-white/50">(Texto de ejemplo editable.)</i></p>
-          </div>
-          <div className="mt-8 flex gap-3 flex-wrap"><Link href="/agendar" className="btn btn-primary">Agendar una cita</Link><Link href="/aprende" className="btn btn-outline">Aprende y conoce</Link></div>
+          </dl>
+
+          {lists.length > 0 && (
+            <div className="grid sm:grid-cols-2 gap-4 mt-4">
+              {lists.map(([t, items]) => (
+                <div key={t} className="card p-5">
+                  <h2 className="font-display text-2xl font-extrabold uppercase">{t}</h2>
+                  <ul className="mt-2 space-y-1.5 text-sm text-slate-700">{items.map((i) => <li key={i} className="flex gap-2"><span className="text-brand font-bold">✓</span>{i}</li>)}</ul>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {PROFILE.philosophy && (
+            <div className="card-dark p-6 mt-4">
+              <h2 className="font-display text-2xl font-extrabold uppercase text-amber">Filosofía de atención</h2>
+              <p className="mt-2 text-white/80">{PROFILE.philosophy}</p>
+            </div>
+          )}
+
+          <div className="mt-8 flex gap-3 flex-wrap"><Link href="/agendar?servicio=s_eval" className="btn btn-primary">Agendar valoración</Link><Link href="/aprende" className="btn btn-outline">Aprende sobre tu cuerpo</Link></div>
         </div>
       </div>
     </div>

@@ -1,14 +1,15 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { slotsFor, hasFree } from "@/lib/availability";
 import { DAYS_SHORT, addDays, dow, fmtTime, longDate, todayStr } from "@/lib/dates";
 
-export function SlotPicker({ serviceId, value, onChange, ignoreApptId }: {
+export function SlotPicker({ serviceId, value, onChange, ignoreApptId, autoSelect }: {
   serviceId: string;
   value: { date: string; time: string } | null;
   onChange: (v: { date: string; time: string } | null) => void;
   ignoreApptId?: string;
+  autoSelect?: boolean;
 }) {
   const { db } = useStore();
   const service = db.services.find((s) => s.id === serviceId)!;
@@ -16,6 +17,15 @@ export function SlotPicker({ serviceId, value, onChange, ignoreApptId }: {
   const [offset, setOffset] = useState(0);
   const [date, setDate] = useState<string>(value?.date ?? "");
   const days = useMemo(() => Array.from({ length: 14 }, (_, i) => addDays(today, offset * 14 + i)), [today, offset]);
+  // Al abrir, deja seleccionado el primer día con horarios para que la pantalla nunca se vea vacía.
+  useEffect(() => {
+    if (!autoSelect || date) return;
+    for (let i = 0; i < 90; i++) {
+      const d = addDays(today, i);
+      if (service.days.includes(dow(d)) && hasFree(d, service, db.appointments, db.blocks, db.services)) { setDate(d); break; }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSelect, serviceId]);
   const slots = date ? slotsFor(date, service, db.appointments, db.blocks, db.services, ignoreApptId) : [];
 
   return (
