@@ -10,7 +10,7 @@ import { Evolution } from "@/components/Evolution";
 import { BeforeVisit } from "@/components/BeforeVisit";
 import { fmtTime, longDate, money, shortDate, todayStr } from "@/lib/dates";
 
-const TABS = ["Mi recuperación", "Mis citas", "Pagos", "Documentos", "Perfil", "Expediente"] as const;
+const TABS = ["Mi recuperación", "Mis citas", "Mensajes", "Pagos", "Documentos", "Perfil", "Expediente"] as const;
 
 export default function Cuenta() {
   const router = useRouter();
@@ -39,6 +39,7 @@ export default function Cuenta() {
   const svc = (id: string) => db.services.find((s) => s.id === id)!;
   const rec = recordFor(p.id, today);
   const rAppt = db.appointments.find((a) => a.id === resched);
+  const msgs = db.notices.filter((n) => n.audience === "Paciente" && n.patientId === p.id);
   const exDone = db.exDone ?? [];
   const pendingEx = EXERCISES.filter((e) => !exDone.includes(e.id)).length;
   const doneSessions = mine.filter((a) => a.status === "completada").length;
@@ -133,6 +134,23 @@ export default function Cuenta() {
             {upcoming.length ? upcoming.map((a) => <ApptRow key={a.id} a={a} actions />) : <Empty>Sin citas próximas.</Empty>}
             <h2 className="font-display text-3xl font-extrabold uppercase pt-4">Historial</h2>
             {history.length ? history.map((a) => <ApptRow key={a.id} a={a} />) : <Empty>Aún no hay historial.</Empty>}
+          </>
+        )}
+        {tab === "Mensajes" && (
+          <>
+            <div className="flex items-center gap-2 flex-wrap"><h2 className="font-display text-3xl font-extrabold uppercase">Mensajes</h2><span className="chip bg-slate-100 text-slate-600">Simulados en la demo</span></div>
+            <p className="text-sm text-slate-600">Así te llegarían los avisos de tus citas por correo y WhatsApp.</p>
+            {msgs.length ? msgs.slice(0, 30).map((n) => (
+              <article key={n.id} className="card p-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={`chip ${n.channel === "WhatsApp" ? "bg-[#dcf8c6] text-[#075e54]" : "bg-sky-100 text-sky-800"}`}>{n.channel}</span>
+                  <b>{n.template}</b>
+                  <span className="ml-auto text-xs text-slate-500">{new Date(n.at).toLocaleString("es-MX", { timeZone: "America/Monterrey", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                </div>
+                {n.subject && <div className="mt-2 text-sm"><b>Asunto:</b> {n.subject}</div>}
+                <p className={`mt-1 text-sm whitespace-pre-line rounded-xl p-3 ${n.channel === "WhatsApp" ? "bg-[#e7ffdb]" : "bg-slate-50"}`}>{n.body}</p>
+              </article>
+            )) : <Empty>Aún no tienes mensajes. Agenda una cita y aparecerán aquí.</Empty>}
           </>
         )}
         {tab === "Pagos" && (
