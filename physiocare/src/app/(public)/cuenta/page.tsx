@@ -7,6 +7,8 @@ import { Empty, FlagBadge, Modal, PayChip, StatusChip } from "@/components/ui";
 import { SlotPicker } from "@/components/SlotPicker";
 import { recordFor, EXERCISES, PLAN_SESSIONS } from "@/lib/seed";
 import { Evolution } from "@/components/Evolution";
+import { RecoveryStreak } from "@/components/RecoveryStreak";
+import { defaultLog } from "@/lib/gamification";
 import { DemoOnly } from "@/components/DemoUI";
 import { BeforeVisit } from "@/components/BeforeVisit";
 import { fmtTime, longDate, money, shortDate, todayStr } from "@/lib/dates";
@@ -41,7 +43,7 @@ export default function Cuenta() {
   const rec = recordFor(p.id, today);
   const rAppt = db.appointments.find((a) => a.id === resched);
   const msgs = db.notices.filter((n) => n.audience === "Paciente" && n.patientId === p.id);
-  const exDone = db.exDone ?? [];
+  const exDone = (db.exLog?.[p.id] ?? defaultLog(p.id, today))[today] ?? [];
   const pendingEx = EXERCISES.filter((e) => !exDone.includes(e.id)).length;
   const doneSessions = mine.filter((a) => a.status === "completada").length;
   const progress = Math.min(100, Math.round((doneSessions / PLAN_SESSIONS) * 100));
@@ -100,9 +102,11 @@ export default function Cuenta() {
               </section>
             </div>
 
+            <RecoveryStreak patientId={p.id} />
+
             <div className="grid lg:grid-cols-3 gap-4">
               <section className="card p-6 lg:col-span-2">
-                <div className="flex items-center justify-between gap-2"><h2 className="font-display text-3xl font-extrabold uppercase">Ejercicios</h2><span className="chip bg-amber/20 text-ink">{pendingEx} pendiente{pendingEx === 1 ? "" : "s"}</span></div>
+                <div className="flex items-center justify-between gap-2"><h2 className="font-display text-3xl font-extrabold uppercase">Ejercicios de hoy</h2><span className="chip bg-amber/20 text-ink">{pendingEx} pendiente{pendingEx === 1 ? "" : "s"}</span></div>
                 <ul className="mt-3 divide-y divide-mist">
                   {EXERCISES.map((e) => { const on = exDone.includes(e.id); return (
                     <li key={e.id}><button onClick={() => toggleExercise(e.id)} aria-pressed={on} className="w-full flex items-center gap-3 py-3 text-left">

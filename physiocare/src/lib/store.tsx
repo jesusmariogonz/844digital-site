@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { Appointment, ApptStatus, Audience, Block, ContentItem, DB, MediaFile, Notice, NotifEvent, NotifSettings, Patient, PayStatus, Question, Service } from "./types";
 import { BRAND, makeSeed } from "./seed";
 import { addDays, fmtTime, longDate, todayStr, uid } from "./dates";
+import { defaultLog, defaultStart } from "./gamification";
 import { DEFAULT_SETTINGS, EVENTS, plan, render, SAMPLE, type Vars } from "./notifications";
 
 const KEY = "efr-demo-v3"; // v3: rediseño editorial (imágenes de servicios)
@@ -213,7 +214,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }),
     updateQuestion: (id, patch) => mut((d) => ({ ...d, questions: d.questions.map((q) => (q.id === id ? { ...q, ...patch } : q)) })),
     likeQuestion: (id) => mut((d) => ({ ...d, questions: d.questions.map((q) => (q.id === id ? { ...q, me2: q.me2 + 1 } : q)) })),
-    toggleExercise: (id) => mut((d) => { const cur = d.exDone ?? []; return { ...d, exDone: cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id] }; }),
+    toggleExercise: (id) => mut((d) => {
+      const pid = d.session.patientId;
+      if (!pid) return d;
+      const today = todayStr();
+      const logs = d.exLog ?? {};
+      const cur = logs[pid] ?? defaultLog(pid, today);
+      const day = cur[today] ?? [];
+      const next = day.includes(id) ? day.filter((x) => x !== id) : [...day, id];
+      const start = d.exStart?.[pid] ?? defaultStart(pid, today) ?? today;
+      return { ...d, exLog: { ...logs, [pid]: { ...cur, [today]: next } }, exStart: { ...(d.exStart ?? {}), [pid]: start } };
+    }),
     setNotifRule: (event, audience, channel, value) => mut((d) => {
       const cur = d.notif ?? DEFAULT_SETTINGS;
       const rule = cur.rules[event];

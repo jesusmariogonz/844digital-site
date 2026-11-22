@@ -6,6 +6,7 @@ import { BackLink, FlagBadge, PageHead, PayChip, StatusChip, Empty } from "@/com
 import { recordFor } from "@/lib/seed";
 import { fmtTime, shortDate, todayStr } from "@/lib/dates";
 import { Evolution } from "@/components/Evolution";
+import { defaultLog, defaultStart, stats } from "@/lib/gamification";
 import { DemoOnly } from "@/components/DemoUI";
 
 const ROLES: [string, string, string, string][] = [
@@ -26,6 +27,7 @@ export default function PacienteDetalle() {
   if (!p) return <Empty>Paciente no encontrado. <BackLink href="/admin/pacientes">Volver</BackLink></Empty>;
   const ap = db.appointments.filter((a) => a.patientId === p.id).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
   const rec = recordFor(p.id, todayStr());
+  const gs = stats(db.exLog?.[p.id] ?? defaultLog(p.id, todayStr()), db.exStart?.[p.id] ?? defaultStart(p.id, todayStr()), todayStr());
   const today = todayStr();
   const nextAppt = ap.filter((a) => a.date >= today && (a.status === "pendiente" || a.status === "confirmada")).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))[0];
   const logs = db.audit.filter((l) => l.target === p.name).slice(0, 6);
@@ -34,6 +36,11 @@ export default function PacienteDetalle() {
     <>
       <BackLink href="/admin/pacientes">Pacientes</BackLink>
       <div className="mt-3"><PageHead title={p.name} sub={`${p.phone} · ${p.email}`} /></div>
+      <dl className="flex flex-wrap gap-x-10 gap-y-3 -mt-2 mb-6 border-y border-ink py-3" aria-label="Constancia en los ejercicios">
+        {[["Racha", `${gs.current} ${gs.current === 1 ? "día" : "días"}`], ["Adherencia", gs.adherence === null ? "—" : `${gs.adherence} %`], ["Ejercicios completados", String(gs.total)], ["Mejor racha", `${gs.best} días`]].map(([k, v]) => (
+          <div key={k} className="flex items-baseline gap-2"><dt className="font-display uppercase tracking-[.14em] text-xs text-slate-500">{k}</dt><dd className="font-display font-extrabold text-2xl">{v}</dd></div>
+        ))}
+      </dl>
       <div className="flex gap-2 mb-5">{(["Datos", "Citas", "Expediente"] as const).map((t) => <button key={t} onClick={() => setTab(t)} className={`btn btn-sm ${tab === t ? "btn-blue" : "btn-outline"}`}>{t}</button>)}</div>
 
       {tab === "Datos" && (

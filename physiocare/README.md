@@ -33,6 +33,16 @@ Aunque estén apagados, **siguen visibles los avisos que evitan malentendidos re
 
 `/demo` es el «backstage» para presentar: guion, flujo completo del producto, estado de cada módulo y reinicio de datos. No está enlazado desde la navegación pública.
 
+## Recovery Streak (constancia del paciente)
+
+En «Mi recuperación» el paciente ve su racha de días consecutivos con ejercicios, la tira de los últimos 14 días, los ejercicios completados, la adherencia, la próxima meta y sus récords personales. Erik ve la racha y la adherencia de cada paciente en su lista y en su ficha.
+
+- **Racha:** días seguidos con al menos un ejercicio; sigue viva si ayer se hizo algo aunque hoy aún no.
+- **Adherencia:** ejercicios completados sobre los prescritos desde el inicio del plan. Hoy cuenta solo cuando el día está completo, así que marcar un ejercicio nunca la baja.
+- **Metas:** rachas de 3, 7, 14, 30 y 60 días; 10, 25, 50 y 100 ejercicios.
+- **Récords:** salen de la evolución clínica (movilidad, fuerza, dolor) cuando la última sesión supera a las anteriores.
+- Todo se calcula con los ejercicios marcados (`src/lib/gamification.ts`); el historial inicial es de ejemplo.
+
 ## Reutilizar la plataforma para otro negocio
 
 Marca del producto y del cliente en `src/lib/brand.ts` (`PRODUCT`, `BRAND`, `PROFILE`). Colores en `src/app/globals.css` (`@theme`). Servicios, contenido y datos de ejemplo en `src/lib/seed.ts`. Con eso se adapta de PhysioCare a otro giro (DentalCare, VetCare…) sin reconstruir el producto.

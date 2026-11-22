@@ -92,15 +92,15 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
         <a href={wa} target="_blank" rel="noopener noreferrer" className="btn !bg-[#25d366] !border-[#25d366] !text-ink">WhatsApp</a>
         <Link href="/agendar?servicio=s_eval" className="btn btn-primary">Agendar valoración</Link>
       </div>
-      <div className="hidden md:block fixed z-40 bottom-5 left-5">
+      <div className="hidden md:block fixed z-40 right-0 top-1/2 -translate-y-1/2">
         {waOpen && (
-          <div role="dialog" aria-label="Ayuda por WhatsApp" className="absolute bottom-14 left-0 w-80 bg-bone border-2 border-ink shadow-[6px_6px_0_var(--color-ink)] reveal">
+          <div role="dialog" aria-label="Ayuda por WhatsApp" className="absolute right-full mr-3 top-1/2 -translate-y-1/2 w-80 bg-bone border-2 border-ink shadow-[6px_6px_0_var(--color-ink)] reveal">
             <div className="bg-ink text-white px-4 py-3 flex items-center justify-between"><b className="font-display text-lg uppercase tracking-wider">¿Necesitas ayuda?</b><button onClick={() => setWaOpen(false)} aria-label="Cerrar" className="text-xl leading-none">×</button></div>
             <div className="p-4"><p className="serif text-lg leading-snug">“{waMessage(path)}”</p></div>
             <div className="p-3 pt-0"><a href={wa} target="_blank" rel="noopener noreferrer" className="btn !bg-[#25d366] !border-[#25d366] !text-ink w-full">Abrir WhatsApp</a></div>
           </div>
         )}
-        <button onClick={() => setWaOpen(!waOpen)} aria-expanded={waOpen} aria-label="Ayuda por WhatsApp" className="btn !bg-[#25d366] !border-[#25d366] !text-ink !px-5 !py-3 shadow-[4px_4px_0_var(--color-ink)]">
+        <button onClick={() => setWaOpen(!waOpen)} aria-expanded={waOpen} aria-label="Ayuda por WhatsApp" className="btn !bg-[#25d366] !border-[#25d366] !text-ink !px-2 !py-5 !tracking-[.25em] [writing-mode:vertical-rl] rotate-180">
           WhatsApp
         </button>
       </div>

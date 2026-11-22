@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useStore } from "@/lib/store";
 import { Modal, PageHead } from "@/components/ui";
 import { shortDate, todayStr } from "@/lib/dates";
+import { defaultLog, defaultStart, stats } from "@/lib/gamification";
 
 export default function Pacientes() {
   const { db, createPatient } = useStore();
@@ -22,10 +23,11 @@ export default function Pacientes() {
         <div className="hidden md:grid grid-cols-12 bg-ink text-white text-xs font-bold uppercase tracking-wider p-4"><div className="col-span-4">Paciente</div><div className="col-span-3">Contacto</div><div className="col-span-2">Citas</div><div className="col-span-2">Próxima</div><div className="col-span-1" /></div>
         {list.map((p) => {
           const ap = db.appointments.filter((a) => a.patientId === p.id);
+          const st = stats(db.exLog?.[p.id] ?? defaultLog(p.id, today), db.exStart?.[p.id] ?? defaultStart(p.id, today), today);
           const next = ap.filter((a) => a.date >= today && a.status !== "cancelada" && a.status !== "completada").sort((a, b) => a.date.localeCompare(b.date))[0];
           return (
             <div key={p.id} className="grid md:grid-cols-12 gap-1 md:gap-3 p-4 border-b border-mist last:border-0 items-center">
-              <div className="md:col-span-4 font-bold">{p.name}</div>
+              <div className="md:col-span-4"><div className="font-bold">{p.name}</div><div className="text-xs text-slate-500 mt-0.5">{st.adherence === null ? "Sin plan de ejercicios" : `Adherencia ${st.adherence} % · Racha ${st.current} ${st.current === 1 ? "día" : "días"}`}</div></div>
               <div className="md:col-span-3 text-sm text-slate-600">{p.phone}<br />{p.email}</div>
               <div className="md:col-span-2 text-sm">{ap.length} cita{ap.length === 1 ? "" : "s"}</div>
               <div className="md:col-span-2 text-sm">{next ? shortDate(next.date) : "—"}</div>
