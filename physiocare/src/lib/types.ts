@@ -90,7 +90,7 @@ export interface Block {
 }
 
 export type NotifEvent =
-  | "solicitud" | "confirmacion" | "recordatorio24" | "recordatorioHoy"
+  | "solicitud" | "confirmacion" | "recordatorio24" | "recordatorioHoy" | "rachaRiesgo"
   | "cancelacion" | "reprogramacion" | "pago" | "nuevaCita" | "nuevaPregunta";
 export type Audience = "Paciente" | "Erik";
 export type Channel = "Correo" | "WhatsApp";

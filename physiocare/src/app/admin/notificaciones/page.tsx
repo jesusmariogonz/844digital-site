@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { Empty, FlagBadge, PageHead } from "@/components/ui";
-import { DEFAULT_SETTINGS, EVENTS, render, SAMPLE, waNumber } from "@/lib/notifications";
+import { DEFAULT_SETTINGS, EVENTS, render, ruleFor, SAMPLE, waNumber } from "@/lib/notifications";
 import type { Audience, Notice, NotifEvent } from "@/lib/types";
 
 const TABS = ["Bitácora", "Reglas", "Plantillas", "Contacto y envío"] as const;
@@ -39,7 +39,7 @@ function NoticeCard({ n }: { n: Notice }) {
 }
 
 export default function Notificaciones() {
-  const { db, setNotifRule, setNotifContact, sendReminders, sendTest } = useStore();
+  const { db, setNotifRule, setNotifContact, sendReminders, sendStreakReminders, sendTest } = useStore();
   const cfg = db.notif ?? DEFAULT_SETTINGS;
   const [tab, setTab] = useState<(typeof TABS)[number]>("Bitácora");
   const [who, setWho] = useState<"todos" | Audience>("todos");
@@ -74,6 +74,10 @@ export default function Notificaciones() {
         <div>
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <button className="btn btn-primary btn-sm" onClick={() => remind("recordatorio24")}>Simular recordatorios de mañana (24 h)</button>
+            <button className="btn btn-outline btn-sm" onClick={() => {
+              const n = sendStreakReminders();
+              setMsg(n < 0 ? "El aviso de racha en riesgo está desactivado en «Reglas»." : n ? `Se generaron avisos de racha en riesgo para ${n} paciente${n > 1 ? "s" : ""} (simulados).` : "Ningún paciente tiene la racha en riesgo ahora mismo.");
+            }}>Simular avisos de racha en riesgo</button>
             <button className="btn btn-outline btn-sm" onClick={() => remind("recordatorioHoy")}>Simular recordatorios de hoy</button>
             <FlagBadge flag="config" />
           </div>
@@ -100,7 +104,7 @@ export default function Notificaciones() {
             </thead>
             <tbody>
               {EVENTS.map((e) => {
-                const r = cfg.rules[e.id];
+                const r = ruleFor(cfg, e.id);
                 return (
                   <tr key={e.id} className="border-t border-mist">
                     <td className="p-3"><div className="font-semibold">{e.label}</div><div className="text-xs text-slate-500">{e.when}</div></td>

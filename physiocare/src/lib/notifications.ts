@@ -6,6 +6,7 @@ export const EVENTS: { id: NotifEvent; label: string; when: string; patient: boo
   { id: "confirmacion", label: "Confirmación de cita", when: "Cuando Erik o el pago confirman la cita", patient: true, erik: false },
   { id: "recordatorio24", label: "Recordatorio 24 horas antes", when: "El día anterior", patient: true, erik: false },
   { id: "recordatorioHoy", label: "Recordatorio el mismo día", when: "La mañana de la cita", patient: true, erik: false },
+  { id: "rachaRiesgo", label: "Racha en riesgo", when: "Cuando aún no registra sus ejercicios del día", patient: true, erik: false },
   { id: "cancelacion", label: "Cancelación", when: "Al cancelar una cita", patient: true, erik: true },
   { id: "reprogramacion", label: "Reprogramación", when: "Al mover una cita", patient: true, erik: true },
   { id: "pago", label: "Pago", when: "Al aprobarse un pago", patient: true, erik: true },
@@ -22,6 +23,7 @@ export const DEFAULT_SETTINGS: NotifSettings = {
     confirmacion: { patient: { ...on } },
     recordatorio24: { patient: { email: false, whatsapp: true } },
     recordatorioHoy: { patient: { email: false, whatsapp: true } },
+    rachaRiesgo: { patient: { email: false, whatsapp: true } },
     cancelacion: { patient: { ...on }, erik: { ...on } },
     reprogramacion: { patient: { ...on }, erik: { email: false, whatsapp: true } },
     pago: { patient: { email: true, whatsapp: false }, erik: { ...on } },
@@ -32,7 +34,7 @@ export const DEFAULT_SETTINGS: NotifSettings = {
 
 export interface Vars {
   nombre?: string; paciente?: string; servicio?: string; fecha?: string; hora?: string;
-  monto?: string; concepto?: string; pregunta?: string; origen?: string; quien?: string;
+  monto?: string; concepto?: string; pregunta?: string; origen?: string; quien?: string; racha?: string;
 }
 interface Tpl { subject: string; email: string; whatsapp: string }
 const SIGN = `\n\n${BRAND.name}`;
@@ -57,6 +59,11 @@ export const TEMPLATES: Record<NotifEvent, { patient?: Tpl; erik?: Tpl }> = {
     subject: "Hoy es tu cita",
     email: "Hola {nombre},\n\nHoy tienes cita de {servicio} a las {hora}. ¡Te esperamos!" + SIGN,
     whatsapp: "Hola {nombre}, hoy tienes cita a las {hora} ({servicio}). ¡Te esperamos!",
+  } },
+  rachaRiesgo: { patient: {
+    subject: "Tu racha está en riesgo",
+    email: "Hola {nombre},\n\nLlevas {racha} días seguidos con tus ejercicios y hoy aún no registras ninguno. Con uno solo mantienes tu racha.\n\nSi hoy no puedes, no pasa nada: retómalo mañana." + SIGN,
+    whatsapp: "Hola {nombre}, llevas {racha} días seguidos con tus ejercicios. Hoy aún no registras ninguno: con uno solo mantienes tu racha.",
   } },
   cancelacion: {
     patient: {
@@ -116,7 +123,7 @@ export function render(event: NotifEvent, audience: Audience, channel: Channel, 
 
 export const SAMPLE: Vars = {
   nombre: "Ana", paciente: "Ana Ramírez", servicio: "Fisioterapia deportiva", fecha: "martes 24 de noviembre", hora: "5:00 p. m.",
-  monto: "$200", concepto: "anticipo", pregunta: "¿Puedo correr si tengo dolor de rodilla?", origen: "sitio web", quien: "el paciente",
+  monto: "$200", racha: "8", concepto: "anticipo", pregunta: "¿Puedo correr si tengo dolor de rodilla?", origen: "sitio web", quien: "el paciente",
 };
 
 /** Mensajes a generar para un evento, según las reglas y los contactos. */
@@ -125,7 +132,7 @@ export function plan(
   patient?: { id: string; email: string; phone: string },
 ): Omit<Notice, "id" | "at">[] {
   const out: Omit<Notice, "id" | "at">[] = [];
-  const rule = s.rules[event];
+  const rule = ruleFor(s, event);
   const label = EVENTS.find((e) => e.id === event)!.label;
   const add = (aud: Audience, ch: Channel, to: string, pid?: string) => {
     const r = render(event, aud, ch, v);
@@ -146,4 +153,9 @@ export function plan(
 export function waNumber(phone: string): string {
   const d = phone.replace(/\D/g, "");
   return d.length === 10 ? `52${d}` : d;
+}
+
+/** Regla de un evento; si los ajustes guardados son anteriores a ese evento, usa la regla por defecto. */
+export function ruleFor(s: NotifSettings, event: NotifEvent) {
+  return s.rules[event] ?? DEFAULT_SETTINGS.rules[event];
 }

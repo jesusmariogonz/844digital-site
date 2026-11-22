@@ -41,6 +41,7 @@ En «Mi recuperación» el paciente ve su racha de días consecutivos con ejerci
 - **Adherencia:** ejercicios completados sobre los prescritos desde el inicio del plan. Hoy cuenta solo cuando el día está completo, así que marcar un ejercicio nunca la baja.
 - **Metas:** rachas de 3, 7, 14, 30 y 60 días; 10, 25, 50 y 100 ejercicios.
 - **Récords:** salen de la evolución clínica (movilidad, fuerza, dolor) cuando la última sesión supera a las anteriores.
+- **Aviso «racha en riesgo»:** evento de notificación para pacientes (WhatsApp activo por defecto, correo apagado; Erik lo edita en «Reglas» y «Plantillas»). Llega a quien tiene racha viva y hoy aún no registra ejercicios, una vez al día por paciente. En la demo se dispara con «Simular avisos de racha en riesgo»; en producción lo enviaría un programador (cron) hacia la tarde.
 - Todo se calcula con los ejercicios marcados (`src/lib/gamification.ts`); el historial inicial es de ejemplo.
 
 ## Reutilizar la plataforma para otro negocio
