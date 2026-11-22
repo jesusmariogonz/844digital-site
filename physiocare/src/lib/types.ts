@@ -90,7 +90,7 @@ export interface Block {
 }
 
 export type NotifEvent =
-  | "solicitud" | "confirmacion" | "recordatorio24" | "recordatorioHoy"
+  | "solicitud" | "confirmacion" | "recordatorio24" | "recordatorioHoy" | "rachaRiesgo"
   | "cancelacion" | "reprogramacion" | "pago" | "nuevaCita" | "nuevaPregunta";
 export type Audience = "Paciente" | "Erik";
 export type Channel = "Correo" | "WhatsApp";
@@ -151,6 +151,8 @@ export interface DB {
   audit: AuditEntry[];
   media: MediaFile[];
   session: Session;
-  exDone?: string[];
+  exDone?: string[]; // en desuso: se conserva por compatibilidad con datos guardados
+  exLog?: Record<string, Record<string, string[]>>; // paciente → fecha → ejercicios completados
+  exStart?: Record<string, string>; // paciente → fecha de inicio del plan
   notif?: NotifSettings;
 }

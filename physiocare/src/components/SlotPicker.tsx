@@ -33,8 +33,8 @@ export function SlotPicker({ serviceId, value, onChange, ignoreApptId, autoSelec
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-display text-2xl font-extrabold uppercase">Elige el día</h4>
         <div className="flex gap-2">
-          <button type="button" className="btn btn-outline btn-sm" disabled={offset === 0} onClick={() => setOffset(offset - 1)} aria-label="Semanas anteriores">←</button>
-          <button type="button" className="btn btn-outline btn-sm" disabled={offset >= 5} onClick={() => setOffset(offset + 1)} aria-label="Semanas siguientes">→</button>
+          <button type="button" className="btn btn-outline btn-sm" disabled={offset === 0} onClick={() => setOffset(offset - 1)} aria-label="Semanas anteriores">Ant.</button>
+          <button type="button" className="btn btn-outline btn-sm" disabled={offset >= 5} onClick={() => setOffset(offset + 1)} aria-label="Semanas siguientes">Sig.</button>
         </div>
       </div>
       <div className="grid grid-cols-7 gap-2">

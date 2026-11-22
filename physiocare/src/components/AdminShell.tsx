@@ -9,10 +9,10 @@ import { PRODUCT } from "@/lib/brand";
 import { fmtTime, shortDate } from "@/lib/dates";
 
 const NAV = [
-  ["/admin", "Resumen", "▦"], ["/admin/agenda", "Agenda", "◷"], ["/admin/pacientes", "Pacientes", "☺"],
-  ["/admin/servicios", "Servicios", "✚"], ["/admin/contenido", "Consola de contenido", "▶"],
-  ["/admin/preguntas", "Preguntas", "?"], ["/admin/pagos", "Pagos", "$"],
-  ["/admin/notificaciones", "Notificaciones", "✉"], ["/admin/integraciones", "Integraciones", "⚙"],
+  ["/admin", "Resumen"], ["/admin/agenda", "Agenda"], ["/admin/pacientes", "Pacientes"],
+  ["/admin/servicios", "Servicios"], ["/admin/contenido", "Consola de contenido"],
+  ["/admin/preguntas", "Preguntas"], ["/admin/pagos", "Pagos"],
+  ["/admin/notificaciones", "Notificaciones"], ["/admin/integraciones", "Integraciones"],
 ] as const;
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -57,12 +57,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   const nav = (
     <nav className="grid gap-1" aria-label="Panel">
-      {NAV.map(([h, l, i]) => {
+      {NAV.map(([h, l]) => {
         const on = h === "/admin" ? path === h : path.startsWith(h);
         return (
-          <Link key={h} href={h} onClick={() => setOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-sm transition ${on ? "bg-amber text-ink" : "text-white/75 hover:bg-white/10"}`}>
-            <span className="w-5 text-center">{i}</span>{l}
-            {l === "Preguntas" && pending > 0 && <span className="ml-auto chip bg-brand text-white !px-2">{pending}</span>}
+          <Link key={h} href={h} onClick={() => setOpen(false)} className={`flex items-center gap-3 px-4 py-2.5 font-display text-[1.05rem] font-semibold uppercase tracking-[.1em] border-l-4 transition ${on ? "border-amber text-white bg-white/10" : "border-transparent text-white/65 hover:text-white hover:bg-white/5"}`}>
+            {l}
+            {l === "Preguntas" && pending > 0 && <span className="ml-auto chip bg-amber text-ink !px-2">{pending}</span>}
           </Link>
         );
       })}

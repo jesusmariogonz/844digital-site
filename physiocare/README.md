@@ -18,6 +18,10 @@ npm run build    # compilación de producción
 npm run lint     # comprobación de tipos (tsc --noEmit)
 ```
 
+## Dirección visual
+
+Estilo **editorial deportivo**: papel cálido y tinta, un solo acento (ámbar), esquinas rectas, líneas finas en lugar de tarjetas, titulares enormes con cursiva serif como contraste, fotografía en blanco y negro con grano (el color vuelve al pasar el cursor) y sin iconos ni glifos decorativos. Los tokens están en `src/app/globals.css` (`@theme`); las fotos se cambian en `src/lib/images.ts`.
+
 ## Modo demostración (avisos)
 
 El sitio se ve **limpio** por defecto, como el producto terminado del cliente. Los avisos de prototipo (barra amarilla, etiquetas «Disponible en la demo» / «Integración pendiente», notas de datos ficticios) solo aparecen si se encienden:
@@ -28,6 +32,17 @@ El sitio se ve **limpio** por defecto, como el producto terminado del cliente. L
 Aunque estén apagados, **siguen visibles los avisos que evitan malentendidos reales**: pagos y mensajes simulados, expediente ficticio y «usa solo datos ficticios».
 
 `/demo` es el «backstage» para presentar: guion, flujo completo del producto, estado de cada módulo y reinicio de datos. No está enlazado desde la navegación pública.
+
+## Recovery Streak (constancia del paciente)
+
+En «Mi recuperación» el paciente ve su racha de días consecutivos con ejercicios, la tira de los últimos 14 días, los ejercicios completados, la adherencia, la próxima meta y sus récords personales. Erik ve la racha y la adherencia de cada paciente en su lista y en su ficha.
+
+- **Racha:** días seguidos con al menos un ejercicio; sigue viva si ayer se hizo algo aunque hoy aún no.
+- **Adherencia:** ejercicios completados sobre los prescritos desde el inicio del plan. Hoy cuenta solo cuando el día está completo, así que marcar un ejercicio nunca la baja.
+- **Metas:** rachas de 3, 7, 14, 30 y 60 días; 10, 25, 50 y 100 ejercicios.
+- **Récords:** salen de la evolución clínica (movilidad, fuerza, dolor) cuando la última sesión supera a las anteriores.
+- **Aviso «racha en riesgo»:** evento de notificación para pacientes (WhatsApp activo por defecto, correo apagado; Erik lo edita en «Reglas» y «Plantillas»). Llega a quien tiene racha viva y hoy aún no registra ejercicios, una vez al día por paciente. En la demo se dispara con «Simular avisos de racha en riesgo»; en producción lo enviaría un programador (cron) hacia la tarde.
+- Todo se calcula con los ejercicios marcados (`src/lib/gamification.ts`); el historial inicial es de ejemplo.
 
 ## Reutilizar la plataforma para otro negocio
 

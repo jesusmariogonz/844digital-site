@@ -79,7 +79,7 @@ export default function Demo() {
         {FLOW.map((f, i) => (
           <li key={f} className="flex items-center gap-2">
             <span className="rounded-full bg-ink text-white font-display text-xl font-bold uppercase px-4 py-1.5">{f}</span>
-            {i < FLOW.length - 1 && <span className="text-brand font-bold" aria-hidden="true">→</span>}
+            {i < FLOW.length - 1 && <span className="text-amber font-bold" aria-hidden="true">/</span>}
           </li>
         ))}
       </ol>

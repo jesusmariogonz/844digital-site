@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { Empty, FlagBadge, PageHead } from "@/components/ui";
-import { DEFAULT_SETTINGS, EVENTS, render, SAMPLE, waNumber } from "@/lib/notifications";
+import { DEFAULT_SETTINGS, EVENTS, render, ruleFor, SAMPLE, waNumber } from "@/lib/notifications";
 import type { Audience, Notice, NotifEvent } from "@/lib/types";
 
 const TABS = ["Bitácora", "Reglas", "Plantillas", "Contacto y envío"] as const;
@@ -33,13 +33,13 @@ function NoticeCard({ n }: { n: Notice }) {
       <div className="text-xs text-slate-500">Para: {n.to}</div>
       {n.subject && <div className="mt-2 text-sm"><b>Asunto:</b> {n.subject}</div>}
       <p className={`mt-1 text-sm whitespace-pre-line rounded-xl p-3 ${isWa ? "bg-[#e7ffdb]" : "bg-slate-50"}`}>{n.body}</p>
-      {manual && <a href={manual} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 text-sm font-bold text-brand underline">Enviar manualmente desde mi WhatsApp ↗</a>}
+      {manual && <a href={manual} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 text-sm font-bold text-brand underline">Enviar manualmente desde mi WhatsApp</a>}
     </article>
   );
 }
 
 export default function Notificaciones() {
-  const { db, setNotifRule, setNotifContact, sendReminders, sendTest } = useStore();
+  const { db, setNotifRule, setNotifContact, sendReminders, sendStreakReminders, sendTest } = useStore();
   const cfg = db.notif ?? DEFAULT_SETTINGS;
   const [tab, setTab] = useState<(typeof TABS)[number]>("Bitácora");
   const [who, setWho] = useState<"todos" | Audience>("todos");
@@ -74,6 +74,10 @@ export default function Notificaciones() {
         <div>
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <button className="btn btn-primary btn-sm" onClick={() => remind("recordatorio24")}>Simular recordatorios de mañana (24 h)</button>
+            <button className="btn btn-outline btn-sm" onClick={() => {
+              const n = sendStreakReminders();
+              setMsg(n < 0 ? "El aviso de racha en riesgo está desactivado en «Reglas»." : n ? `Se generaron avisos de racha en riesgo para ${n} paciente${n > 1 ? "s" : ""} (simulados).` : "Ningún paciente tiene la racha en riesgo ahora mismo.");
+            }}>Simular avisos de racha en riesgo</button>
             <button className="btn btn-outline btn-sm" onClick={() => remind("recordatorioHoy")}>Simular recordatorios de hoy</button>
             <FlagBadge flag="config" />
           </div>
@@ -100,7 +104,7 @@ export default function Notificaciones() {
             </thead>
             <tbody>
               {EVENTS.map((e) => {
-                const r = cfg.rules[e.id];
+                const r = ruleFor(cfg, e.id);
                 return (
                   <tr key={e.id} className="border-t border-mist">
                     <td className="p-3"><div className="font-semibold">{e.label}</div><div className="text-xs text-slate-500">{e.when}</div></td>
@@ -145,7 +149,7 @@ export default function Notificaciones() {
             <div><label className="label" htmlFor="ne">Correo</label><input id="ne" type="email" required className="input" value={contact.email} onChange={(e) => { setContact({ ...contact, email: e.target.value }); setSaved(false); }} /></div>
             <div><label className="label" htmlFor="nw">WhatsApp</label><input id="nw" type="tel" required className="input" value={contact.wa} onChange={(e) => { setContact({ ...contact, wa: e.target.value }); setSaved(false); }} /></div>
             <p className="text-xs text-slate-500">Datos de ejemplo: reemplázalos por los reales.</p>
-            <div className="flex items-center gap-3"><button className="btn btn-primary">Guardar</button>{saved && <span className="text-emerald-700 text-sm font-semibold">Guardado ✓</span>}</div>
+            <div className="flex items-center gap-3"><button className="btn btn-primary">Guardar</button>{saved && <span className="text-emerald-700 text-sm font-semibold">Guardado</span>}</div>
           </form>
           <div className="space-y-4">
             {[

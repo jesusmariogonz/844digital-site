@@ -12,7 +12,7 @@ export const SERVICES: Service[] = [
     id: "s_eval", name: "Evaluación funcional", short: "Valoración inicial completa",
     description: "Revisión de tu historia, movilidad, fuerza y patrón de movimiento para entender el origen de tu molestia y definir un plan.",
     benefits: ["Valoración profesional personalizada", "Plan de trabajo por etapas", "Resolución de dudas sobre tu lesión"],
-    duration: 60, price: 600, deposit: 200, days: [1, 2, 3, 4, 5, 6], active: true, image: IMG.stretch,
+    duration: 60, price: 600, deposit: 200, days: [1, 2, 3, 4, 5, 6], active: true, image: IMG.manual,
   },
   {
     id: "s_dep", name: "Fisioterapia deportiva", short: "Lesiones deportivas y retorno al juego",

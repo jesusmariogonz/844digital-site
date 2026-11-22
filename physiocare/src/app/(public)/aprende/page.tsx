@@ -71,7 +71,7 @@ export default function Aprende() {
                 <div className="text-xs font-bold uppercase tracking-wider text-brand">{c.category}</div>
                 <h3 className="font-display text-2xl font-extrabold leading-tight mt-1">{c.title}</h3>
                 <p className="text-sm text-slate-600 mt-1">{c.description}</p>
-                {c.type === "instagram" && <div className="mt-3 text-sm font-bold text-brand">Ver en Instagram ↗</div>}
+                {c.type === "instagram" && <div className="mt-3 text-sm font-bold text-brand">Ver en Instagram</div>}
               </div>
             </>
           );

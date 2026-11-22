@@ -3,9 +3,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { Appointment, ApptStatus, Audience, Block, ContentItem, DB, MediaFile, Notice, NotifEvent, NotifSettings, Patient, PayStatus, Question, Service } from "./types";
 import { BRAND, makeSeed } from "./seed";
 import { addDays, fmtTime, longDate, todayStr, uid } from "./dates";
-import { DEFAULT_SETTINGS, EVENTS, plan, render, SAMPLE, type Vars } from "./notifications";
+import { defaultLog, defaultStart, stats } from "./gamification";
+import { DEFAULT_SETTINGS, EVENTS, plan, render, ruleFor, SAMPLE, type Vars } from "./notifications";
 
-const KEY = "efr-demo-v2"; // v2: contenido y categorías nuevas del bloque 2
+const KEY = "efr-demo-v3"; // v3: rediseño editorial (imágenes de servicios)
 const SKEY = "efr-session-v1"; // la sesión es por pestaña (sessionStorage): paciente y Erik pueden estar abiertos a la vez
 const GUEST = { role: "guest" } as const;
 
@@ -47,6 +48,7 @@ interface Ctx {
   setNotifRule: (event: NotifEvent, audience: "patient" | "erik", channel: "email" | "whatsapp", value: boolean) => void;
   setNotifContact: (patch: Partial<Pick<NotifSettings, "erikEmail" | "erikWhatsapp">>) => void;
   sendReminders: (kind: "recordatorio24" | "recordatorioHoy") => number;
+  sendStreakReminders: () => number;
   sendTest: (event: NotifEvent, audience: Audience) => void;
   audit: (action: string, target: string) => void;
   resetDemo: () => void;
@@ -213,14 +215,39 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }),
     updateQuestion: (id, patch) => mut((d) => ({ ...d, questions: d.questions.map((q) => (q.id === id ? { ...q, ...patch } : q)) })),
     likeQuestion: (id) => mut((d) => ({ ...d, questions: d.questions.map((q) => (q.id === id ? { ...q, me2: q.me2 + 1 } : q)) })),
-    toggleExercise: (id) => mut((d) => { const cur = d.exDone ?? []; return { ...d, exDone: cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id] }; }),
+    toggleExercise: (id) => mut((d) => {
+      const pid = d.session.patientId;
+      if (!pid) return d;
+      const today = todayStr();
+      const logs = d.exLog ?? {};
+      const cur = logs[pid] ?? defaultLog(pid, today);
+      const day = cur[today] ?? [];
+      const next = day.includes(id) ? day.filter((x) => x !== id) : [...day, id];
+      const start = d.exStart?.[pid] ?? defaultStart(pid, today) ?? today;
+      return { ...d, exLog: { ...logs, [pid]: { ...cur, [today]: next } }, exStart: { ...(d.exStart ?? {}), [pid]: start } };
+    }),
     setNotifRule: (event, audience, channel, value) => mut((d) => {
       const cur = d.notif ?? DEFAULT_SETTINGS;
-      const rule = cur.rules[event];
+      const rule = ruleFor(cur, event);
       const pref = { ...(rule[audience] ?? { email: false, whatsapp: false }), [channel]: value };
       return { ...d, notif: { ...cur, rules: { ...cur.rules, [event]: { ...rule, [audience]: pref } } } };
     }),
     setNotifContact: (patch) => mut((d) => ({ ...d, notif: { ...(d.notif ?? DEFAULT_SETTINGS), ...patch } })),
+    sendStreakReminders: () => {
+      // Pacientes con racha viva que hoy aún no registran ejercicios; un solo aviso por paciente y día.
+      // Devuelve -1 si Erik tiene el aviso apagado en «Reglas».
+      const pref = ruleFor(db.notif ?? DEFAULT_SETTINGS, "rachaRiesgo").patient;
+      if (!pref?.email && !pref?.whatsapp) return -1;
+      const today = todayStr();
+      const utcDay = new Date().toISOString().slice(0, 10);
+      const info = (p: Patient) => stats(db.exLog?.[p.id] ?? defaultLog(p.id, today), db.exStart?.[p.id] ?? defaultStart(p.id, today), today);
+      const targets = db.patients.filter((p) => {
+        const s = info(p);
+        return s.current > 0 && s.doneToday === 0 && !db.notices.some((n) => n.event === "rachaRiesgo" && n.patientId === p.id && n.at.slice(0, 10) === utcDay);
+      });
+      if (targets.length) mut((d) => targets.reduce((acc, p) => fire(acc, "rachaRiesgo", { nombre: p.name.split(" ")[0], racha: String(info(p).current) }, p), d));
+      return targets.length;
+    },
     sendReminders: (kind) => {
       const target = kind === "recordatorio24" ? addDays(todayStr(), 1) : todayStr();
       const list = db.appointments.filter((a) => a.date === target && (a.status === "confirmada" || a.status === "pendiente"));

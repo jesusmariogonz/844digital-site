@@ -50,7 +50,7 @@ export function Calendar({ appts, blocks, patients, services, onSelect, onSlot, 
                 {blocks.filter((b) => b.date === d).map((b) => (
                   <div key={b.id} className="absolute inset-x-0.5 rounded-lg bg-slate-200 border border-dashed border-slate-400 text-slate-600 text-[.7rem] px-1.5 py-1 overflow-hidden"
                     style={{ top: (toMin(b.start) - H0 * 60) * PX, height: Math.max(22, (toMin(b.end) - toMin(b.start)) * PX) }}>
-                    🚫 {b.reason}{onRemoveBlock && <button className="ml-1 font-bold underline" onClick={() => onRemoveBlock(b.id)}>quitar</button>}
+                    {b.reason}{onRemoveBlock && <button className="ml-1 font-bold underline" onClick={() => onRemoveBlock(b.id)}>quitar</button>}
                   </div>
                 ))}
                 {live.filter((a) => a.date === d).map((a) => {
@@ -99,9 +99,9 @@ export function Calendar({ appts, blocks, patients, services, onSelect, onSlot, 
     <div className="card p-4">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2">
-          <button className="btn btn-outline btn-sm" onClick={() => move(-1)} aria-label="Anterior">←</button>
+          <button className="btn btn-outline btn-sm" onClick={() => move(-1)} aria-label="Anterior">Ant.</button>
           <button className="btn btn-outline btn-sm" onClick={() => setCursor(today)}>Hoy</button>
-          <button className="btn btn-outline btn-sm" onClick={() => move(1)} aria-label="Siguiente">→</button>
+          <button className="btn btn-outline btn-sm" onClick={() => move(1)} aria-label="Siguiente">Sig.</button>
           <h3 className="font-display text-2xl font-extrabold uppercase ml-2">{title}</h3>
         </div>
         <div className="flex gap-1 bg-mist rounded-full p-1">

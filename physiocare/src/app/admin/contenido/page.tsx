@@ -64,7 +64,7 @@ export default function Consola() {
             <div><label className="label" htmlFor="ct">Tipo</label><select id="ct" className="input" value={f.type} onChange={(e) => setF({ ...f, type: e.target.value as ContentType })}>{TYPES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>
             {(f.type === "video" || f.type === "instagram") && (
               <div><label className="label" htmlFor="cl">{f.type === "video" ? "Enlace de YouTube" : "Enlace de la publicación"}</label><input id="cl" required type="url" className="input" placeholder={f.type === "video" ? "https://www.youtube.com/watch?v=…" : "https://www.instagram.com/p/…"} value={f.link} onChange={(e) => setF({ ...f, link: e.target.value })} />
-                {f.type === "video" && f.link && <p className={`text-xs mt-1 font-semibold ${yt ? "text-emerald-700" : "text-red-600"}`}>{yt ? "✓ Enlace reconocido" : "No reconocemos este enlace"}</p>}</div>
+                {f.type === "video" && f.link && <p className={`text-xs mt-1 font-semibold ${yt ? "text-emerald-700" : "text-red-600"}`}>{yt ? "Enlace reconocido" : "No reconocemos este enlace"}</p>}</div>
             )}
             <div><label className="label" htmlFor="ctt">Título</label><input id="ctt" required className="input" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></div>
             <div><label className="label" htmlFor="cd">Descripción</label><textarea id="cd" required rows={3} className="input" value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} /></div>
@@ -104,7 +104,7 @@ export default function Consola() {
         <div>
           <div onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)} onDrop={(e) => { e.preventDefault(); setDrag(false); onFiles(e.dataTransfer.files); }}
             className={`rounded-3xl border-2 border-dashed p-10 text-center transition ${drag ? "border-brand bg-brand/10" : "border-slate-300 bg-white"}`}>
-            <div className="text-5xl">⬆</div>
+            <div className="font-display text-xl font-bold uppercase tracking-[.2em] text-slate-400">Subir</div>
             <p className="font-display text-3xl font-extrabold uppercase mt-2">Arrastra tus fotos y videos aquí</p>
             <p className="text-slate-600 text-sm mt-1">o selecciónalos desde tu teléfono o computadora</p>
             <button className="btn btn-primary mt-4" onClick={() => fileRef.current?.click()}>Elegir archivos</button>
@@ -115,7 +115,7 @@ export default function Consola() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-6">
             {db.media.map((m) => (
               <div key={m.id} className="card overflow-hidden">
-                <div className="aspect-square bg-mist grid place-items-center">{m.dataUrl ? <Img src={m.dataUrl} alt={m.name} /> : <span className="text-4xl">{m.kind === "video" ? "🎬" : "📄"}</span>}</div>
+                <div className="aspect-square bg-mist grid place-items-center">{m.dataUrl ? <Img src={m.dataUrl} alt={m.name} /> : <span className="font-display text-2xl font-bold uppercase tracking-[.15em] text-slate-500">{m.kind === "video" ? "Video" : "Doc"}</span>}</div>
                 <div className="p-3"><div className="text-sm font-semibold truncate">{m.name}</div><div className="text-xs text-slate-500">{m.kind} · {fmtSize(m.size)}</div><button className="text-xs font-bold text-red-600 mt-1" onClick={() => removeMedia(m.id)}>Quitar</button></div>
               </div>
             ))}
